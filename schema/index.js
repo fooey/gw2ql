@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import Promise from 'bluebird';
+import DataLoader from 'dataloader';
 
 import {
   GraphQLSchema,
@@ -11,6 +12,7 @@ import {
   GraphQLID,
   GraphQLNonNull
 } from 'graphql/type';
+
 
 const WorldType = new GraphQLObjectType({
   name: 'WorldType',
@@ -52,9 +54,9 @@ const MatchType = new GraphQLObjectType({
     worlds: { 
       type: MatchWorldsType,
       resolve: (match) => Promise.props({
-        red: getWorld(match.worlds.red),
-        green: getWorld(match.worlds.green),
-        blue: getWorld(match.worlds.blue),
+        red: worldsLoader.load(match.worlds.red),
+        green: worldsLoader.load(match.worlds.green),
+        blue: worldsLoader.load(match.worlds.blue),
       })
     },
   }
@@ -77,7 +79,7 @@ const RootType = new GraphQLObjectType({
       args: {
         ids: { type: new GraphQLNonNull(GraphQLID), }
       },
-      resolve: (parent, { ids }) => getWorlds(ids),
+      resolve: (parent, { ids }) => worldsLoader.load(ids),
     },
     
     match: {
@@ -85,14 +87,14 @@ const RootType = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLID), }
       },
-      resolve: (parent, { id }) => getMatch(id),
+      resolve: (parent, { id }) => matchesLoader.load(id),
     },
     matches: {
       type: new GraphQLList(MatchType),
       args: {
         ids: { type: new GraphQLList(GraphQLID), }
       },
-      resolve: (parent, { ids }) => getMatches(ids),
+      resolve: (parent, { ids }) => matchesLoader.loadMany(ids),
     },
   }
 });
@@ -110,28 +112,43 @@ function getWorld(id) {
   return fetch(`/v2/worlds/${id}`);
 }
 
-function getWorlds(ids='all') {
-  console.log('getWorld');
-  return fetch(`/v2/worlds?ids=${ids}`);
+function getWorlds(ids=['all']) {
+  console.log('getWorld', ids);
+  
+  const idList = [...ids].join(',');
+  
+  return fetch(`/v2/worlds?ids=${idList}`);
 }
+
+
+const worldsLoader = new DataLoader(
+  worldIds => {
+    console.log('worldsLoader', worldIds);
+    return getWorlds(worldIds);
+  }
+);
+
 
 function getMatch(id) {
   console.log('getMatch', id);
-  if (id === 'all') {
-    return fetch(`/v2/wvw/matches?ids=all`);     
-  } else {
-    return fetch(`/v2/wvw/matches/${id}`);
-  }
+  return fetch(`/v2/wvw/matches/${id}`);
 }
 
 function getMatches(ids=['all']) {
   console.log('getMatches', ids);
-  if (!Array.isArray(ids)) {
-    ids = ids.split(',');
-  }
   
-  return Promise.map(ids, id => getMatch(id));
+  const idList = [...ids].join(',');
+  
+  return fetch(`/v2/wvw/matches?ids=${idList}`); 
 }
+
+
+const matchesLoader = new DataLoader(
+  matchIds => {
+    console.log('matchesLoader', matchIds);
+    return getMatches(matchIds);
+  }
+);
 
 
 const schema = new GraphQLSchema({ query: RootType });
