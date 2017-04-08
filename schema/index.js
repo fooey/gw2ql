@@ -36,9 +36,34 @@ const MatchWorldsType = new GraphQLObjectType({
 const MatchScoresType = new GraphQLObjectType({
   name: 'MatchScoresType',
   fields: {
-    red: { type: GraphQLInt },         
-    green: { type: GraphQLInt },         
-    blue: { type: GraphQLInt },         
+    red: { type: GraphQLInt },
+    green: { type: GraphQLInt },
+    blue: { type: GraphQLInt },
+  }
+});
+
+const MatchObjectiveType = new GraphQLObjectType({
+  name: 'MatchObjectiveType',
+  fields: {
+    id: { type: GraphQLString },
+    type: { type: GraphQLString },
+    owner: { type: GraphQLString },
+    last_flipped: { type: GraphQLString },
+    claimed_by: { type: GraphQLString },
+    points_tick: { type: GraphQLInt },
+    points_capture: { type: GraphQLInt },
+    yaks_delivered: { type: GraphQLInt },
+  }
+});
+
+const MatchMapType = new GraphQLObjectType({
+  name: 'MatchMapType',
+  fields: {
+    id: { type: GraphQLString },
+    type: { type: GraphQLString },
+    deaths: { type: MatchScoresType },
+    kills: { type: MatchScoresType },
+    objectives: { type: new GraphQLList(MatchObjectiveType) }
   }
 });
 
@@ -51,7 +76,8 @@ const MatchType = new GraphQLObjectType({
     scores: { type: MatchScoresType },
     deaths: { type: MatchScoresType },
     kills: { type: MatchScoresType },
-    worlds: { 
+    victory_points: { type: MatchScoresType },
+    worlds: {
       type: MatchWorldsType,
       resolve: (match) => Promise.props({
         red: worldsLoader.load(match.worlds.red),
@@ -59,6 +85,7 @@ const MatchType = new GraphQLObjectType({
         blue: worldsLoader.load(match.worlds.blue),
       })
     },
+    maps: { type: new GraphQLList(MatchMapType) },
   }
 });
 
@@ -81,7 +108,7 @@ const RootType = new GraphQLObjectType({
       },
       resolve: (parent, { ids }) => worldsLoader.load(ids),
     },
-    
+
     match: {
       type: MatchType,
       args: {
@@ -94,7 +121,13 @@ const RootType = new GraphQLObjectType({
       args: {
         ids: { type: new GraphQLList(GraphQLID), }
       },
-      resolve: (parent, { ids }) => matchesLoader.loadMany(ids),
+      resolve: (parent, { ids=["all"] }) => {
+          if (ids.indexOf('all') !== -1 || !Array.isArray(ids) || ids.length === 0) {
+              return getMatches(['all']);
+          } else {
+              return matchesLoader.loadMany(ids);
+          }
+      },
     },
   }
 });
@@ -114,9 +147,9 @@ function getWorld(id) {
 
 function getWorlds(ids=['all']) {
   console.log('getWorld', ids);
-  
+
   const idList = [...ids].join(',');
-  
+
   return fetch(`/v2/worlds?ids=${idList}`);
 }
 
@@ -136,10 +169,10 @@ function getMatch(id) {
 
 function getMatches(ids=['all']) {
   console.log('getMatches', ids);
-  
+
   const idList = [...ids].join(',');
-  
-  return fetch(`/v2/wvw/matches?ids=${idList}`); 
+
+  return fetch(`/v2/wvw/matches?ids=${idList}`);
 }
 
 
@@ -147,7 +180,7 @@ const matchesLoader = new DataLoader(
   matchIds => {
     console.log('matchesLoader', matchIds);
     return getMatches(matchIds);
-  }
+}, { cache: false }
 );
 
 
