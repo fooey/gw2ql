@@ -8,6 +8,7 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
+  GraphQLFloat,
   GraphQLList,
   GraphQLID,
   GraphQLNonNull
@@ -20,6 +21,22 @@ const WorldType = new GraphQLObjectType({
     id: { type: GraphQLString },
     name: { type: GraphQLString },
     population: { type: GraphQLString },
+  }
+});
+
+const ObjectiveType = new GraphQLObjectType({
+  name: 'ObjectiveType',
+  fields: {
+    id: { type: GraphQLString },
+    name: { type: GraphQLString },
+    sector_id: { type: GraphQLInt },
+    type: { type: GraphQLString },
+    map_type: { type: GraphQLString },
+    map_id: { type: GraphQLInt },
+    coord: { type: new GraphQLList(GraphQLFloat) },
+    label_coord: { type: new GraphQLList(GraphQLFloat) },
+    marker: { type: GraphQLString },
+    chat_link: { type: GraphQLString },
   }
 });
 
@@ -53,6 +70,10 @@ const MatchObjectiveType = new GraphQLObjectType({
     points_tick: { type: GraphQLInt },
     points_capture: { type: GraphQLInt },
     yaks_delivered: { type: GraphQLInt },
+    objective: {
+        type: ObjectiveType,
+        resolve: ({ id }) => objectivesLoader.load(id),
+    },
   }
 });
 
@@ -134,54 +155,74 @@ const RootType = new GraphQLObjectType({
 
 
 function fetch(relativeURL) {
-  const fullUrl = `https://api.guildwars2.com${relativeURL}`;
-  console.log('fullUrl', fullUrl);
-  return axios.get(fullUrl)
+  const fetchUrl = `https://api.guildwars2.com${relativeURL}`;
+  console.log('fetchUrl', fetchUrl);
+  return axios.get(fetchUrl)
     .then(response => response.data)
 }
 
 function getWorld(id) {
-  console.log('getWorld', id);
+  // console.log('getWorld', id);
   return fetch(`/v2/worlds/${id}`);
 }
 
 function getWorlds(ids=['all']) {
-  console.log('getWorld', ids);
+  // console.log('getWorld', ids);
 
   const idList = [...ids].join(',');
 
   return fetch(`/v2/worlds?ids=${idList}`);
 }
 
-
 const worldsLoader = new DataLoader(
   worldIds => {
-    console.log('worldsLoader', worldIds);
+    // console.log('worldsLoader', worldIds);
     return getWorlds(worldIds);
   }
 );
 
 
+
 function getMatch(id) {
-  console.log('getMatch', id);
+  // console.log('getMatch', id);
   return fetch(`/v2/wvw/matches/${id}`);
 }
 
 function getMatches(ids=['all']) {
-  console.log('getMatches', ids);
+  // console.log('getMatches', ids);
 
   const idList = [...ids].join(',');
 
   return fetch(`/v2/wvw/matches?ids=${idList}`);
 }
 
-
 const matchesLoader = new DataLoader(
   matchIds => {
-    console.log('matchesLoader', matchIds);
+    // console.log('matchesLoader', matchIds);
     return getMatches(matchIds);
 }, { cache: false }
 );
+
+
+
+function getObjective(id) {
+  // console.log('getObjective', id);
+  return fetch(`/v2/wvw/objectives/${id}`);
+}
+
+function getObjectives(ids=['all']) {
+  // console.log('getObjectives', ids);
+
+  const idList = [...ids].join(',');
+
+  return fetch(`/v2/wvw/objectives?ids=${idList}`);
+}
+
+const objectivesLoader = new DataLoader(
+  objectiveIds => {
+    // console.log('objectivesLoader', objectiveIds);
+    return getObjectives(objectiveIds);
+});
 
 
 const schema = new GraphQLSchema({ query: RootType });
