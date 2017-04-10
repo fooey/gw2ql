@@ -2,6 +2,7 @@
 import axios from 'axios';
 import Promise from 'bluebird';
 import DataLoader from 'dataloader';
+import LRU  from 'lru-cache';
 
 import {
   GraphQLSchema,
@@ -13,6 +14,9 @@ import {
   GraphQLID,
   GraphQLNonNull
 } from 'graphql/type';
+
+const CACHE_LONG = 1000 * 60 * 60;
+const CACHE_SHORT = 1000 * 5;
 
 
 const WorldType = new GraphQLObjectType({
@@ -120,14 +124,21 @@ const RootType = new GraphQLObjectType({
       args: {
         id: { type: new GraphQLNonNull(GraphQLID), }
       },
-      resolve: (parent, { id }) => getWorld(id),
+      resolve: (parent, { id }) => worldsLoader.load(id),
     },
     worlds: {
       type: new GraphQLList(WorldType),
       args: {
-        ids: { type: new GraphQLNonNull(GraphQLID), }
+        ids: { type: new GraphQLList(GraphQLID), }
       },
-      resolve: (parent, { ids }) => worldsLoader.load(ids),
+    //   resolve: (parent, { ids }) => worldsLoader.loadMany(ids),
+      resolve: (parent, { ids=["all"] }) => {
+          if (ids.indexOf('all') !== -1 || !Array.isArray(ids) || ids.length === 0) {
+              return fetch(`/v2/worlds`).then(ids => worldsLoader.loadMany(ids));
+          } else {
+              return worldsLoader.loadMany(ids);
+          }
+      },
     },
 
     match: {
@@ -144,7 +155,7 @@ const RootType = new GraphQLObjectType({
       },
       resolve: (parent, { ids=["all"] }) => {
           if (ids.indexOf('all') !== -1 || !Array.isArray(ids) || ids.length === 0) {
-              return getMatches(['all']);
+              return fetch(`/v2/wvw/matches`).then(ids => matchesLoader.loadMany(ids));
           } else {
               return matchesLoader.loadMany(ids);
           }
@@ -160,6 +171,7 @@ function fetch(relativeURL) {
   return axios.get(fetchUrl)
     .then(response => response.data)
 }
+
 
 function getWorld(id) {
   // console.log('getWorld', id);
@@ -178,9 +190,11 @@ const worldsLoader = new DataLoader(
   worldIds => {
     // console.log('worldsLoader', worldIds);
     return getWorlds(worldIds);
-  }
-);
-
+  }, {
+  cacheMap: LRU({
+      maxAge: CACHE_LONG
+  })
+});
 
 
 function getMatch(id) {
@@ -200,8 +214,11 @@ const matchesLoader = new DataLoader(
   matchIds => {
     // console.log('matchesLoader', matchIds);
     return getMatches(matchIds);
-}, { cache: false }
-);
+}, {
+    cacheMap: LRU({
+        maxAge: CACHE_SHORT
+    })
+});
 
 
 
@@ -222,6 +239,10 @@ const objectivesLoader = new DataLoader(
   objectiveIds => {
     // console.log('objectivesLoader', objectiveIds);
     return getObjectives(objectiveIds);
+}, {
+    cacheMap: LRU({
+        maxAge: CACHE_LONG
+    })
 });
 
 
