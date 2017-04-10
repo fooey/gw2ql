@@ -1,3 +1,5 @@
+import "app-module-path/cwd";
+
 import express from 'express';
 import bodyParser from 'body-parser';
 
@@ -7,7 +9,7 @@ import {
 } from 'graphql-server-express';
 
 
-import schema from './schema';
+import schema from 'src/schema';
 
 const app = express();
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
@@ -88,6 +90,34 @@ app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
     }
   }
 }
+
+
+{
+  us1: match(id: "1-1") {
+    ...matchFields
+  }
+  eu1: match(id: "2-1") {
+    ...matchFields
+  }
+  matches {
+    ...matchFields
+  }
+}
+
+fragment matchFields on MatchType {
+  id
+  start_time
+  scores { red green blue }
+  worlds {
+    red { id name }
+    blue { id name }
+    green { id name }
+  }
+}
+
+
+
+
 
 
  */

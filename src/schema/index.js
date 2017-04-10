@@ -1,8 +1,7 @@
 
-import axios from 'axios';
 import Promise from 'bluebird';
 import DataLoader from 'dataloader';
-import LRU  from 'lru-cache';
+import LRU from 'lru-cache';
 
 import {
     GraphQLSchema,
@@ -14,6 +13,14 @@ import {
     GraphQLID,
     GraphQLNonNull
 } from 'graphql/type';
+
+import api, {
+	fetch,
+	fetchWorlds,
+	getWorlds,
+	getMatches,
+	objectivesLoader,
+} from 'src/lib/api';
 
 const CACHE_LONG = 1000 * 60 * 60;
 const CACHE_SHORT = 1000 * 5;
@@ -130,7 +137,7 @@ const WorldsQuery = {
     },
     resolve: (parent, { ids=["all"] }) => {
         if (ids.indexOf('all') !== -1 || !Array.isArray(ids) || ids.length === 0) {
-            return fetch(`/v2/worlds`).then(ids => worldsLoader.loadMany(ids));
+            return fetchWorlds().then(ids => worldsLoader.loadMany(ids));
         } else {
             return worldsLoader.loadMany(ids);
         }
@@ -198,63 +205,15 @@ const RootType = new GraphQLObjectType({
   }
 });
 
-
-function fetch(relativeURL) {
-    const fetchUrl = `https://api.guildwars2.com${relativeURL}`;
-    console.log('fetchUrl', fetchUrl);
-    return axios.get(fetchUrl)
-        .then(response => response.data)
-}
-
-
-function getWorld(id) {
-    // console.log('getWorld', id);
-    return fetch(`/v2/worlds/${id}`);
-}
-
-function getWorlds(ids=['all']) {
-    const idList = [...ids].join(',');
-
-    return fetch(`/v2/worlds?ids=${idList}`);
-}
-
 const worldsLoader = new DataLoader(
-    worldIds => getWorlds(worldIds.sort()),
-    { cacheMap: LRU({ maxAge: CACHE_LONG })
-});
-
-
-function getMatch(id) {
-    return fetch(`/v2/wvw/matches/${id}`);
-}
-
-function getMatches(ids=['all']) {
-    const idList = [...ids].join(',');
-
-    return fetch(`/v2/wvw/matches?ids=${idList}`);
-}
+    worldIds => getWorlds(worldIds),
+    { cacheMap: LRU({ maxAge: CACHE_LONG })}
+);
 
 const matchesLoader = new DataLoader(
-    matchIds => getMatches(matchIds.sort()),
-    { cacheMap: LRU({ maxAge: CACHE_SHORT })
-});
-
-
-
-function getObjective(id) {
-    return fetch(`/v2/wvw/objectives/${id}`);
-}
-
-function getObjectives(ids=['all']) {
-    const idList = [...ids].join(',');
-
-    return fetch(`/v2/wvw/objectives?ids=${idList}`);
-}
-
-const objectivesLoader = new DataLoader(
-    objectiveIds => getObjectives(objectiveIds.sort()),
-    { cacheMap: LRU({ maxAge: CACHE_LONG })
-});
+    matchIds => getMatches(matchIds),
+    { cacheMap: LRU({ maxAge: CACHE_SHORT })}
+);
 
 
 const schema = new GraphQLSchema({ query: RootType });
