@@ -19,7 +19,7 @@ import api, {
 	fetchWorlds,
 	getWorlds,
 	getMatches,
-	objectivesLoader,
+	getObjectives,
 } from 'src/lib/api';
 
 const CACHE_LONG = 1000 * 60 * 60;
@@ -83,7 +83,7 @@ const MatchObjectiveType = new GraphQLObjectType({
         yaks_delivered: { type: GraphQLInt },
         objective: {
             type: ObjectiveType,
-            resolve: ({ id }) => objectivesLoader.load(id),
+            resolve: ({ id }) => getObjectives(id),
         },
     }
 });
@@ -173,7 +173,7 @@ const ObjectiveQuery = {
     args: {
         id: { type: new GraphQLNonNull(GraphQLID), }
     },
-    resolve: (parent, { id }) => objectivesLoader.load(id),
+    resolve: (parent, { id }) => getObjectives(id),
 };
 
 const ObjectivesQuery = {
@@ -181,13 +181,7 @@ const ObjectivesQuery = {
     args: {
         ids: { type: new GraphQLList(GraphQLID), }
     },
-    resolve: (parent, { ids=["all"] }) => {
-        if (ids.indexOf('all') !== -1 || !Array.isArray(ids) || ids.length === 0) {
-            return fetch(`/v2/wvw/objectives`).then(ids => objectivesLoader.loadMany(ids));
-        } else {
-            return objectivesLoader.loadMany(ids);
-        }
-    },
+    resolve: (parent, { ids=["all"] }) => getObjectives(ids),
 };
 
 

@@ -22,7 +22,7 @@
     "babel-watch": "^2.0.6"
   },
   "scripts": {
-    "start": "babel-watch ./src/server.js",
-    "babel-node": "babel-node ./src/server.js"
+    "dev": "babel-watch ./src/server.js",
+    "start": "babel-node ./src/server.js"
   }
 }
