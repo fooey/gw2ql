@@ -3,18 +3,46 @@ import "app-module-path/cwd";
 import express from 'express';
 import bodyParser from 'body-parser';
 
+import GraphQLSchema from './schema/index';
+
+import { GraphQLOptions } from 'graphql-server-core';
 import {
 	graphqlExpress,
 	graphiqlExpress,
-} from 'graphql-server-express';
+ } from 'graphql-server-express';
 
+ // options object
+const myGraphQLOptions = {
+  schema: GraphQLSchema,
 
-import schema from 'src/schema';
+  // // values to be used as context and rootValue in resolvers
+  // context?: any,
+  // rootValue?: any,
+  //
+  // // function used to format errors before returning them to clients
+  // formatError?: Function,
+  //
+  // // additional validation rules to be applied to client-specified queries
+  // validationRules?: Array<ValidationRule>,
+  //
+  // // function applied for each query in a batch to format parameters before passing them to `runQuery`
+  // formatParams?: Function,
+  //
+  // // function applied to each response before returning data to clients
+  // formatResponse?: Function,
+  //
+  // // a boolean option that will trigger additional debug logging if execution errors occur
+  debug: true
+};
 
 const app = express();
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
-app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
-app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
+
+app.use( '/graphql', bodyParser.json(), graphqlExpress(myGraphQLOptions) );
+app.use( '/graphiql', graphiqlExpress({ endpointURL: '/graphql', }) );
+
+
+// app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
+// app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
 
 /*
 
