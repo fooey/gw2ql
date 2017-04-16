@@ -1,20 +1,29 @@
-import "app-module-path/cwd";
+import 'app-module-path/cwd';
 
 import express from 'express';
 import bodyParser from 'body-parser';
+import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
+import Promise from 'bluebird';
 
-import {
-	graphqlExpress,
-	graphiqlExpress,
-} from 'graphql-server-express';
+import schema from 'src/schema/index';
 
-
-import schema from 'src/schema';
+import { init as initWorlds, getWorlds} from 'src/lib/api/world';
 
 const app = express();
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
-app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
-app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
+
+console.log('Initializing data');
+Promise.props({
+	worlds: initWorlds(),
+}).then(() => {
+	console.log('Data initialized, starting server');
+	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+	app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
+
+	app.use('/worlds', (req, res) => getWorlds().then(worlds => res.json(worlds)));
+
+	app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
+});
+
 
 /*
 

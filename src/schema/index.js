@@ -22,42 +22,29 @@ import api, {
 	getObjectives,
 } from 'src/lib/api';
 
+import Objective from 'src/schema/objective';
+import World from 'src/schema/world';
+
 const CACHE_LONG = 1000 * 60 * 60;
 const CACHE_SHORT = 1000 * 5;
 
-
-const WorldType = new GraphQLObjectType({
-    name: 'WorldType',
-    fields: {
-        id: { type: GraphQLString },
-        name: { type: GraphQLString },
-        population: { type: GraphQLString },
-    }
-});
-
-const ObjectiveType = new GraphQLObjectType({
-    name: 'ObjectiveType',
-    fields: {
-        id: { type: GraphQLString },
-        name: { type: GraphQLString },
-        sector_id: { type: GraphQLInt },
-        type: { type: GraphQLString },
-        map_type: { type: GraphQLString },
-        map_id: { type: GraphQLInt },
-        coord: { type: new GraphQLList(GraphQLFloat) },
-        label_coord: { type: new GraphQLList(GraphQLFloat) },
-        marker: { type: GraphQLString },
-        chat_link: { type: GraphQLString },
-    }
-});
+//
+// const WorldType = new GraphQLObjectType({
+//     name: 'WorldType',
+//     fields: {
+//         id: { type: GraphQLString },
+//         name: { type: GraphQLString },
+//         population: { type: GraphQLString },
+//     }
+// });
 
 
 const MatchWorldsType = new GraphQLObjectType({
     name: 'MatchWorldsType',
     fields: {
-        red: { type: WorldType },
-        green: { type: WorldType },
-        blue: { type: WorldType },
+        red: { type: World.WorldType },
+        green: { type: World.WorldType },
+        blue: { type: World.WorldType },
 }
 });
 
@@ -82,7 +69,7 @@ const MatchObjectiveType = new GraphQLObjectType({
         points_capture: { type: GraphQLInt },
         yaks_delivered: { type: GraphQLInt },
         objective: {
-            type: ObjectiveType,
+            type: Objective.ObjectiveType,
             resolve: ({ id }) => getObjectives(id),
         },
     }
@@ -112,37 +99,14 @@ const MatchType = new GraphQLObjectType({
         worlds: {
             type: MatchWorldsType,
             resolve: ({ worlds }) => Promise.props({
-                red: worldsLoader.load(worlds.red),
-                green: worldsLoader.load(worlds.green),
-                blue: worldsLoader.load(worlds.blue),
+                red: World.worldsLoader.load(worlds.red),
+                green: World.worldsLoader.load(worlds.green),
+                blue: World.worldsLoader.load(worlds.blue),
             })
         },
         maps: { type: new GraphQLList(MatchMapType) },
     }
 });
-
-
-const WorldQuery = {
-    type: WorldType,
-    args: {
-        id: { type: new GraphQLNonNull(GraphQLID), }
-    },
-    resolve: (parent, { id }) => worldsLoader.load(id),
-};
-
-const WorldsQuery = {
-    type: new GraphQLList(WorldType),
-    args: {
-        ids: { type: new GraphQLList(GraphQLID), }
-    },
-    resolve: (parent, { ids=["all"] }) => {
-        if (ids.indexOf('all') !== -1 || !Array.isArray(ids) || ids.length === 0) {
-            return fetchWorlds().then(ids => worldsLoader.loadMany(ids));
-        } else {
-            return worldsLoader.loadMany(ids);
-        }
-    },
-}
 
 
 const MatchQuery = {
@@ -168,41 +132,16 @@ const MatchesQuery = {
 };
 
 
-const ObjectiveQuery = {
-    type: ObjectiveType,
-    args: {
-        id: { type: new GraphQLNonNull(GraphQLID), }
-    },
-    resolve: (parent, { id }) => getObjectives(id),
-};
-
-const ObjectivesQuery = {
-    type: new GraphQLList(ObjectiveType),
-    args: {
-        ids: { type: new GraphQLList(GraphQLID), }
-    },
-    resolve: (parent, { ids=["all"] }) => getObjectives(ids),
-};
-
-
 const RootType = new GraphQLObjectType({
   name: 'RootType',
-  fields: {
-    world: WorldQuery,
-    worlds: WorldsQuery,
-
-    match: MatchQuery,
-    matches: MatchesQuery,
-
-    objective: ObjectiveQuery,
-    objectives: ObjectivesQuery,
-  }
+  fields: Object.assign(
+	  Objective.queries,
+	  World.queries,
+	  {
+	    match: MatchQuery,
+	    matches: MatchesQuery,
+	})
 });
-
-const worldsLoader = new DataLoader(
-    worldIds => getWorlds(worldIds),
-    { cacheMap: LRU({ maxAge: CACHE_LONG })}
-);
 
 const matchesLoader = new DataLoader(
     matchIds => getMatches(matchIds),
