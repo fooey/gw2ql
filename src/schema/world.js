@@ -11,12 +11,13 @@ import {
     GraphQLNonNull
 } from 'graphql/type';
 
+import langs from 'src/lib/api/langs';
+
 import {
 	fetchWorlds,
 	getWorld,
 	getWorlds,
 	CACHE_LONG,
-	langs,
 } from 'src/lib/api';
 
 

@@ -2,14 +2,15 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
 
-let cache = {};
 
+import langs from 'src/lib/api/langs';
 
 import {
 	fetch,
 	CACHE_LONG,
-	langs
 } from 'src/lib/api';
+
+let cache = {};
 
 
 const ENDPOINT_WORLDS = `/v2/worlds`;

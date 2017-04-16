@@ -6,38 +6,7 @@ import _ from 'lodash';
 export const CACHE_LONG = 1000 * 60 * 60;
 export const CACHE_SHORT = 1000 * 5;
 
-export const langs = {
-	"en": {
-		"slug": "en",
-		"label": "EN",
-		"link": "/en",
-		"name": "English"
-	},
-	"de": {
-		"slug": "de",
-		"label": "DE",
-		"link": "/de",
-		"name": "Deutsch"
-	},
-	"es": {
-		"slug": "es",
-		"label": "ES",
-		"link": "/es",
-		"name": "Español"
-	},
-	"fr": {
-		"slug": "fr",
-		"label": "FR",
-		"link": "/fr",
-		"name": "Français"
-	},
-	"zh": {
-		"slug": "zh",
-		"label": "ZH",
-		"link": "/zh",
-		"name": "Chinese"
-	},
-};
+import langs from 'src/lib/api/langs';
 
 
 export { getObjectives } from './objective';

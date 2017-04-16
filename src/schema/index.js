@@ -24,6 +24,7 @@ import api, {
 
 import Objective from 'src/schema/objective';
 import World from 'src/schema/world';
+import Lang from 'src/schema/lang';
 
 const CACHE_LONG = 1000 * 60 * 60;
 const CACHE_SHORT = 1000 * 5;
@@ -137,6 +138,7 @@ const RootType = new GraphQLObjectType({
   fields: Object.assign(
 	  Objective.queries,
 	  World.queries,
+	  Lang.queries,
 	  {
 	    match: MatchQuery,
 	    matches: MatchesQuery,
