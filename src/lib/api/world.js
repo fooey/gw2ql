@@ -3,12 +3,9 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 
 
+import { fetch } from 'src/lib/api';
 import langs from 'src/lib/api/langs';
 
-import {
-	fetch,
-	CACHE_LONG,
-} from 'src/lib/api';
 
 let cache = {};
 
@@ -51,7 +48,7 @@ export function init() {
 				_.set(cache, id, world);
 			});
 
-			return worlds;
+			return cache;
 		});
 	});
 

@@ -4,10 +4,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import Promise from 'bluebird';
+import _ from 'lodash';
 
 import schema from 'src/schema/index';
 
-import { getLangs } from 'src/lib/api/langs';
+import { langs } from 'src/lib/api/langs';
+import { init as initObjectives, getObjectives } from 'src/lib/api/objective';
 import { init as initWorlds, getWorlds } from 'src/lib/api/world';
 
 const app = express();
@@ -15,13 +17,15 @@ const app = express();
 console.log('Initializing data');
 Promise.props({
 	worlds: initWorlds(),
-}).then(() => {
+	objectives: initObjectives(),
+}).then(props => {
 	console.log('Data initialized, starting server');
 	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 	app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
 
-	app.use('/langs', (req, res) => getLangs().then(langs => res.json(langs)));
-	app.use('/worlds', (req, res) => getWorlds().then(worlds => res.json(worlds)));
+	app.use('/langs', (req, res) => res.json(_.values(langs)));
+	app.use('/objectives', (req, res) => res.json(props.objectives));
+	app.use('/worlds', (req, res) => res.json(props.worlds));
 
 	app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
 });

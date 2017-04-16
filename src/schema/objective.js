@@ -1,7 +1,5 @@
 
-import Promise from 'bluebird';
-import DataLoader from 'dataloader';
-import LRU from 'lru-cache';
+import _ from 'lodash';
 
 import {
     GraphQLObjectType,
@@ -13,6 +11,8 @@ import {
     GraphQLNonNull
 } from 'graphql/type';
 
+import langs from 'src/lib/api/langs';
+
 import {
 	getObjectives,
 } from 'src/lib/api';
@@ -21,9 +21,10 @@ import {
 
 export const ObjectiveType = new GraphQLObjectType({
     name: 'ObjectiveType',
-    fields: () => ({
+    fields: () => _.reduce(langs, (acc, lang, langSlug) => {
+		return _.set(acc, langSlug, { type: ObjectiveLangType });
+	}, {
         id: { type: GraphQLString },
-        name: { type: GraphQLString },
         sector_id: { type: GraphQLInt },
         type: { type: GraphQLString },
         map_type: { type: GraphQLString },
@@ -35,6 +36,13 @@ export const ObjectiveType = new GraphQLObjectType({
     })
 });
 
+export const ObjectiveLangType = new GraphQLObjectType({
+    name: 'ObjectiveLangType',
+    fields: () => ({
+        name: { type: GraphQLString },
+        slug: { type: GraphQLString },
+    })
+});
 
 export const ObjectiveQuery = {
     type: ObjectiveType,
