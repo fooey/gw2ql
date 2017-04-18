@@ -25,8 +25,8 @@ export const langs = {
 	},
 	zh: {
 		slug: "zh",
-		label: "ZH",
-		name: "Chinese"
+		label: "中文",
+		name: "中文"
 	},
 };
 
