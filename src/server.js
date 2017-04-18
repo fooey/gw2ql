@@ -8,24 +8,29 @@ import _ from 'lodash';
 
 import schema from 'src/schema/index';
 
-import { langs } from 'src/lib/api/langs';
-import { init as initObjectives, getObjectives } from 'src/lib/api/objective';
-import { init as initWorlds, getWorlds } from 'src/lib/api/world';
+import { langs, getLang } from 'src/lib/api/langs';
+import { init as initObjectives, getObjective, getObjectives } from 'src/lib/api/objective';
+import { init as initWorlds, getWorld, getWorlds } from 'src/lib/api/world';
 
 const app = express();
 
 console.log('Initializing data');
-Promise.props({
-	worlds: initWorlds(),
-	objectives: initObjectives(),
-}).then(props => {
+Promise.all([
+	initWorlds(),
+	initObjectives(),
+]).then(() => {
 	console.log('Data initialized, starting server');
 	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 	app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
 
+	app.use('/langs/:slug([a-z]{2})', (req, res) => getLang(req.params.slug).then(lang => res.json(lang)));
 	app.use('/langs', (req, res) => res.json(_.values(langs)));
-	app.use('/objectives', (req, res) => res.json(props.objectives));
-	app.use('/worlds', (req, res) => res.json(props.worlds));
+
+	app.use('/objectives/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
+	app.use('/objectives', (req, res) => getObjectives().then(result => res.json(result)));
+
+	app.use('/worlds/:id', (req, res) => getWorld(req.params.id).then(result => res.json(result)));
+	app.use('/worlds', (req, res) => getWorlds().then(result => res.json(result)));
 
 	app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
 });
