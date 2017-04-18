@@ -24,7 +24,7 @@ export function init() {
 
 		const promisedLangs = _.reduce(langs, (acc, lang, langSlug) => {
 			return Object.assign(acc, {
-				[langSlug]: fetchWorlds({ ids: idList, lang: langSlug }).then(result => _.first(result))
+				[langSlug]: fetchWorlds({ ids: idList, lang: langSlug }).then(result => _.keyBy(result, 'id'))
 			});
 		}, {});
 
@@ -38,14 +38,14 @@ export function init() {
 				};
 
 				const world = _.reduce(langs, (acc, lang, langSlug) => {
-					const name = _.get(worlds, [langSlug, 'name']);
+					const name = _.get(worlds, [langSlug, id, 'name']);
 					const slug = slugify(name);
 
 					return _.set(acc, langSlug, { name, slug });
 
 				}, worldBase);
 
-				_.set(cache, id, world);
+				_.set(cache, [id], world);
 			});
 
 			return cache;
@@ -72,5 +72,6 @@ export function getWorlds(ids=['all']) {
 		return getWorlds(_.keys(cache));
 	} else {
 		return Promise.map(ids, id => _.get(cache, id));
+		// return Promise.resolve(_.values(_.pick(cache, ids)));
 	}
 }

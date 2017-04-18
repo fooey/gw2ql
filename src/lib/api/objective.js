@@ -23,7 +23,7 @@ export function init() {
 
 		const promisedLangs = _.reduce(langs, (acc, lang, langSlug) => {
 			return Object.assign(acc, {
-				[langSlug]: fetchObjectives({ ids: idList, lang: langSlug }).then(result => _.first(result))
+				[langSlug]: fetchObjectives({ ids: idList, lang: langSlug }).then(result => _.keyBy(result,  'id'))
 			});
 		}, {});
 
@@ -33,18 +33,18 @@ export function init() {
 			ids.forEach(id => {
 				const objectiveBase = {
 					id,
-			        sector_id: _.get(objectives, ['en', 'sector_id']),
-			        type: _.get(objectives, ['en', 'type']),
-			        map_type: _.get(objectives, ['en', 'map_type']),
-			        map_id: _.get(objectives, ['en', 'map_id']),
-			        coord: _.get(objectives, ['en', 'coord']),
-			        label_coord: _.get(objectives, ['en', 'label_coord']),
-			        marker: _.get(objectives, ['en', 'marker']),
-			        chat_link: _.get(objectives, ['en', 'chat_link']),
+			        sector_id: _.get(objectives, ['en', id, 'sector_id']),
+			        type: _.get(objectives, ['en', id, 'type']),
+			        map_type: _.get(objectives, ['en', id, 'map_type']),
+			        map_id: _.get(objectives, ['en', id, 'map_id']),
+			        coord: _.get(objectives, ['en', id, 'coord']),
+			        label_coord: _.get(objectives, ['en', id, 'label_coord']),
+			        marker: _.get(objectives, ['en', id, 'marker']),
+			        chat_link: _.get(objectives, ['en', id, 'chat_link']),
 				};
 
 				const objective = _.reduce(langs, (acc, lang, langSlug) => {
-					const name = _.get(objectives, [langSlug, 'name']);
+					const name = _.get(objectives, [langSlug, id, 'name']);
 					const slug = slugify(name);
 
 					return _.set(acc, langSlug, { name, slug });
