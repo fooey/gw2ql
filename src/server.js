@@ -2,37 +2,46 @@ import 'app-module-path/cwd';
 
 import express from 'express';
 import bodyParser from 'body-parser';
-import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
+import cors from 'cors';
+
 import Promise from 'bluebird';
 import _ from 'lodash';
+
+import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
+import { printSchema } from 'graphql/utilities/schemaPrinter';
 
 import schema from 'src/schema/index';
 
 import { init as initApi } from 'src/lib/api';
-import { langs, getLang } from 'src/lib/api/langs';
+import { langs, getLang, getLangs } from 'src/lib/api/langs';
 import { init as initObjectives, getObjective, getObjectives } from 'src/lib/api/objective';
 import { init as initWorlds, getWorld, getWorlds } from 'src/lib/api/world';
 
-const app = express();
+const app = express().use('*', cors());
 
 console.log('Initializing data');
 Promise.all([
-	initApi(),
-	initWorlds(),
-	initObjectives(),
+	// initApi(),
+	// initWorlds(),
+	// initObjectives(),
 ]).then(() => {
 	console.log('Data initialized, starting server');
-	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
-	app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql'}));
+	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, context: {} }));
+	app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql '}));
 
 	app.use('/langs/:slug([a-z]{2})', (req, res) => getLang(req.params.slug).then(lang => res.json(lang)));
 	app.use('/langs', (req, res) => res.json(_.values(langs)));
 
-	app.use('/objectives/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
-	app.use('/objectives', (req, res) => getObjectives().then(result => res.json(result)));
+	app.use('/schema', (req, res) => {
+	  res.set('Content-Type', 'text/plain');
+	  res.send(printSchema(schema));
+	});
 
-	app.use('/worlds/:id', (req, res) => getWorld(req.params.id).then(result => res.json(result)));
-	app.use('/worlds', (req, res) => getWorlds().then(result => res.json(result)));
+	// app.use('/objectives/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
+	// app.use('/objectives', (req, res) => getObjectives().then(result => res.json(result)));
+	//
+	// app.use('/worlds/:id', (req, res) => getWorld(req.params.id).then(result => res.json(result)));
+	// app.use('/worlds', (req, res) => getWorlds().then(result => res.json(result)));
 
 	app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
 });
