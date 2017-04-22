@@ -1,4 +1,6 @@
 
+import path from 'path';
+
 import Promise from 'bluebird';
 import _ from 'lodash';
 
@@ -8,7 +10,6 @@ import langs from 'src/lib/api/langs';
 
 
 let cache = {};
-
 
 const ENDPOINT_WORLDS = `/v2/worlds`;
 
@@ -48,7 +49,7 @@ export function init() {
 				_.set(cache, [id], world);
 			});
 
-			return cache;
+			return _.sortBy(cache, 'id');
 		});
 	});
 

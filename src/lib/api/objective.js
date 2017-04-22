@@ -18,6 +18,10 @@ function slugify(str) {
 
 
 export function init() {
+	return buildCache();
+};
+
+function buildCache() {
 	return fetchObjectives().then(ids => {
 		const idList = ids.toString();
 
@@ -54,11 +58,10 @@ export function init() {
 				_.set(cache, id, objective);
 			});
 
-			return cache;
+			return _.sortBy(cache, ['id']);
 		});
 	});
-
-};
+}
 
 
 export function fetchObjectives(query) {

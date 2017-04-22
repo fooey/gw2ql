@@ -8,6 +8,7 @@ import _ from 'lodash';
 
 import schema from 'src/schema/index';
 
+import { init as initApi } from 'src/lib/api';
 import { langs, getLang } from 'src/lib/api/langs';
 import { init as initObjectives, getObjective, getObjectives } from 'src/lib/api/objective';
 import { init as initWorlds, getWorld, getWorlds } from 'src/lib/api/world';
@@ -16,6 +17,7 @@ const app = express();
 
 console.log('Initializing data');
 Promise.all([
+	initApi(),
 	initWorlds(),
 	initObjectives(),
 ]).then(() => {
