@@ -36,7 +36,7 @@ export function getLang(slug) {
 
 
 export function getLangs(slugs = []) {
-	console.log('getLangs', slugs.toString());
+	// console.log('getLangs', slugs.toString());
 
 	if (!Array.isArray(slugs) || slugs.length === 0 || slugs.indexOf('all') !== -1) {
 		return Promise.resolve(_.values(langs));

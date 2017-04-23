@@ -11,7 +11,7 @@ import {
     GraphQLNonNull
 } from 'graphql/type';
 
-import langs from 'src/lib/api/langs';
+import langs from 'src/lib/api/lang';
 
 import {
 	getObjectives,

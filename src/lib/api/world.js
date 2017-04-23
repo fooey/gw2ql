@@ -6,7 +6,7 @@ import _ from 'lodash';
 
 
 import { fetch } from 'src/lib/api';
-import langs from 'src/lib/api/langs';
+import { langs } from 'src/lib/api/lang';
 
 
 let cache = {};
@@ -23,9 +23,9 @@ export function init() {
 	return fetchWorlds().then(ids => {
 		const idList = ids.toString();
 
-		const promisedLangs = _.reduce(langs, (acc, lang, langSlug) => {
-			return Object.assign(acc, {
-				[langSlug]: fetchWorlds({ ids: idList, lang: langSlug }).then(result => _.keyBy(result, 'id'))
+		const promisedLangs = _.reduce(langs, (acc, lang) => {
+			return _.merge(acc, {
+				[lang.slug]: fetchWorlds({ ids: idList, lang: lang.slug }).then(result => _.keyBy(result, 'id'))
 			});
 		}, {});
 
@@ -35,14 +35,17 @@ export function init() {
 			ids.forEach(id => {
 				const worldBase = {
 					id,
-					population: _.get(worlds, ['en', 'population'])
+					population: _.get(worlds, ['en', id, 'population']),
+					slugs: [],
 				};
 
-				const world = _.reduce(langs, (acc, lang, langSlug) => {
-					const name = _.get(worlds, [langSlug, id, 'name']);
+				const world = _.reduce(langs, (acc, lang) => {
+					const name = _.get(worlds, [lang.slug, id, 'name']);
 					const slug = slugify(name);
 
-					return _.set(acc, langSlug, { name, slug });
+					acc.slugs.push(slug);
+
+					return _.set(acc, lang.slug, { name, slug });
 
 				}, worldBase);
 

@@ -16,12 +16,12 @@ import {
 	// langs,
 	getLang,
 	getLangs,
- } from 'src/lib/api/langs';
+ } from 'src/lib/api/lang';
 
 
 
-export const LangType = new GraphQLObjectType({
-    name: 'LangType',
+export const Lang = new GraphQLObjectType({
+    name: 'Lang',
     fields: () => ({
         slug: { type: GraphQLString },
         name: { type: GraphQLString },
@@ -31,7 +31,7 @@ export const LangType = new GraphQLObjectType({
 
 
 export const LangQuery = {
-    type: LangType,
+    type: Lang,
     args: {
         slug: { type: new GraphQLNonNull(GraphQLID), }
     },
@@ -39,7 +39,7 @@ export const LangQuery = {
 };
 
 export const LangsQuery = {
-    type: new GraphQLList(LangType),
+    type: new GraphQLList(Lang),
     args: {
         slugs: { type: new GraphQLList(GraphQLID), }
     },
@@ -51,7 +51,7 @@ export const queries = {
 	langs: LangsQuery,
 };
 
-export default {
-	LangType,
-	queries
-};
+// export default {
+// 	Lang,
+// 	queries
+// };

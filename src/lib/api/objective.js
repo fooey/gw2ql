@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 
 import { fetch } from 'src/lib/api';
-import langs from 'src/lib/api/langs';
+import langs from 'src/lib/api/lang';
 
 let cache = {};
 

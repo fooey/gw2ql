@@ -1,7 +1,6 @@
 
-import DataLoader from 'dataloader';
+import Promise from 'bluebird';
 import _ from 'lodash';
-import LRU from 'lru-cache';
 
 import {
     GraphQLObjectType,
@@ -11,28 +10,27 @@ import {
     GraphQLNonNull
 } from 'graphql/type';
 
-import langs from 'src/lib/api/langs';
+import { langs, getLangs } from 'src/lib/api/lang';
 
 import {
-	fetchWorlds,
 	getWorld,
 	getWorlds,
-	CACHE_LONG,
 } from 'src/lib/api';
 
 
-export const WorldType = new GraphQLObjectType({
-    name: 'WorldType',
-    fields: () => _.reduce(langs, (acc, lang, langSlug) => {
-		return _.set(acc, langSlug, { type: WorldLangType });
+export const World = new GraphQLObjectType({
+    name: 'World',
+    fields: () => _.reduce(langs, (acc, lang) => {
+		return _.set(acc, lang.slug, { type: WorldLang });
 	}, {
         id: { type: GraphQLString },
 		population: { type: GraphQLString },
+		slugs: { type: new GraphQLList(GraphQLString) },
     })
 });
 
-export const WorldLangType = new GraphQLObjectType({
-    name: 'WorldLangType',
+export const WorldLang = new GraphQLObjectType({
+    name: 'WorldLang',
     fields: () => ({
         name: { type: GraphQLString },
         slug: { type: GraphQLString },
@@ -41,7 +39,7 @@ export const WorldLangType = new GraphQLObjectType({
 
 
 export const WorldQuery = {
-    type: WorldType,
+    type: World,
     args: {
         id: { type: new GraphQLNonNull(GraphQLID), }
     },
@@ -49,7 +47,7 @@ export const WorldQuery = {
 };
 
 export const WorldsQuery = {
-    type: new GraphQLList(WorldType),
+    type: new GraphQLList(World),
     args: {
         ids: { type: new GraphQLList(GraphQLID), }
     },
@@ -58,19 +56,7 @@ export const WorldsQuery = {
     },
 };
 
-export const worldsLoader = new DataLoader(
-    worldIds => getWorlds(worldIds),
-    { cacheMap: LRU({ maxAge: CACHE_LONG })}
-);
-
 export const queries = {
 	world: WorldQuery,
 	worlds: WorldsQuery,
-};
-
-
-export default {
-	WorldType,
-	queries,
-	worldsLoader,
 };
