@@ -10,10 +10,17 @@ import {
 	resolvers as langResolvers
 } from 'src/schema/lang';
 
+import {
+	World,
+	resolvers as worldResolvers
+} from 'src/schema/world';
+
 
 
 const Query = `
 	type Query {
+		world(id: String!): World,
+		worlds(ids: [String!]): [World],
 		lang(slug: String!): Lang,
 		langs(slugs: [String!]): [Lang],
 	}
@@ -31,9 +38,14 @@ const executableSchema = makeExecutableSchema({
 	  SchemaDefinition,
 	  Query,
 	  Lang,
+	  World,
   ],
   resolvers: Object.assign({},
-	  langResolvers
+	  langResolvers,
+	//   {Query: Object.assign({},
+	// 		langResolvers.Query,
+	// 		worldResolvers.Query,
+	//   )},
   ),
   logger: { log: (e) => console.log(e) },
   allowUndefinedInResolve: false,

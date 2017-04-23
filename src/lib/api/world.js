@@ -35,7 +35,7 @@ export function init() {
 			ids.forEach(id => {
 				const worldBase = {
 					id,
-					population: _.get(worlds, ['en', 'population'])
+					population: _.get(worlds, ['en', id, 'population'])
 				};
 
 				const world = _.reduce(langs, (acc, lang, langSlug) => {
@@ -62,12 +62,12 @@ export function fetchWorlds(query) {
 }
 
 export function getWorld(id) {
-	// console.log('getWorld', id);
+	// console.log('getWorld', id, _.get(cache, id));
     return Promise.resolve(_.get(cache, id));
 }
 
 export function getWorlds(ids=['all']) {
-	// console.log('getWorlds', ids.toString());
+	console.log('getWorlds', ids.toString());
 
 	if (!Array.isArray(ids) || ids.length === 0 || ids.indexOf('all') !== -1) {
 		return getWorlds(_.keys(cache));

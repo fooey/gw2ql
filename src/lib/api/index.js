@@ -8,11 +8,12 @@ import storage from 'node-persist';
 export const CACHE_LONG = 1000 * 60 * 60;
 export const CACHE_SHORT = 1000 * 5;
 
-import langs from 'src/lib/api/langs';
+// import langs from 'src/lib/api/langs';
 
 
-export { getObjectives } from './objective';
-export { fetchWorlds, getWorld, getWorlds } from './world';
+// export { getObjectives } from './objective';
+export { getLang, getLangs } from './langs';
+export { getWorld, getWorlds } from './world';
 
 
 export const BASE_URL = `https://api.guildwars2.com`;

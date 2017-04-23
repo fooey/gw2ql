@@ -17,34 +17,41 @@ import { langs, getLang, getLangs } from 'src/lib/api/langs';
 import { init as initObjectives, getObjective, getObjectives } from 'src/lib/api/objective';
 import { init as initWorlds, getWorld, getWorlds } from 'src/lib/api/world';
 
+
 const app = express().use('*', cors());
 
-console.log('Initializing data');
+
+const PORT = 4000;
+
+console.info(Date.now(), 'SERVER', 'Initializing data...');
 Promise.all([
-	// initApi(),
-	// initWorlds(),
+	initApi(),
+	initWorlds(),
 	// initObjectives(),
-]).then(() => {
-	console.log('Data initialized, starting server');
+])
+.then(() => console.info(Date.now(), 'SERVER', 'Data initialized, starting...'))
+.then(() => {
+	console.info(Date.now(), 'SERVER', 'Creating routes...');
+
 	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, context: {} }));
-	app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql '}));
+	app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+	app.use('/schema', (req, res) => res.type('text/plain').send(printSchema(schema)));
 
 	app.use('/langs/:slug([a-z]{2})', (req, res) => getLang(req.params.slug).then(lang => res.json(lang)));
 	app.use('/langs', (req, res) => res.json(_.values(langs)));
 
-	app.use('/schema', (req, res) => {
-	  res.set('Content-Type', 'text/plain');
-	  res.send(printSchema(schema));
-	});
+	app.use('/worlds/:id([0-9]{4})', (req, res) => getWorld(req.params.id).then(result => res.json(result)));
+	app.use('/worlds', (req, res) => getWorlds().then(result => res.json(result)));
+
 
 	// app.use('/objectives/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
 	// app.use('/objectives', (req, res) => getObjectives().then(result => res.json(result)));
-	//
-	// app.use('/worlds/:id', (req, res) => getWorld(req.params.id).then(result => res.json(result)));
-	// app.use('/worlds', (req, res) => getWorlds().then(result => res.json(result)));
 
-	app.listen(4000, () => console.log('Now browse to localhost:4000/graphiql'));
-});
+})
+.then(() =>
+	app.listen(PORT, () => console.info(Date.now(), 'SERVER', `Now browse to localhost:${PORT}/graphiql`))
+)
+.catch((err) => console.error(Date.now(), 'SERVER', 'error', err));
 
 
 /*

@@ -31,6 +31,7 @@ export const langs = {
 };
 
 export function getLang(slug) {
+	console.log('getLang', slug);
 	return Promise.resolve(_.get(langs, slug));
 };
 
