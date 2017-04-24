@@ -1,7 +1,7 @@
 {
   "name": "express-graphql",
   "version": "1.0.0",
-  "main": "src/server.js",
+  "main": "./src/server.js",
   "license": "MIT",
   "dependencies": {
     "app-module-path": "^2.2.0",
@@ -26,7 +26,7 @@
     "nodemon": "^1.11.0"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node",
+    "dev": "nodemon ./src/server.js --exec babel-node",
     "lint": "eslint src",
     "lint-watch": "esw src --watch",
     "start": "babel-node ./src/server.js"

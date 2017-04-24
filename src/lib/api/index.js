@@ -58,7 +58,7 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 		},
 	};
 
-	console.log('fetchUrl', fetchUrl, params);
+	// console.log('fetchUrl', fetchUrl, params);
 
 	return storage.getItem(fetchUrl).then(result => {
 		if (result) {
@@ -68,7 +68,7 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 			// console.log('cache miss', fetchUrl);
             return instance(fetchUrl, retryOptions)
 				.then(res => {
-					console.log('fetched', res.url);
+					// console.log('fetched', res.url);
 
 					return res.json();
 				}).then(result => {
