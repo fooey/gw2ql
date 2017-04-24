@@ -1,5 +1,4 @@
 
-import Promise from 'bluebird';
 import _ from 'lodash';
 
 import {
@@ -7,10 +6,10 @@ import {
     GraphQLString,
     GraphQLList,
     GraphQLID,
-    GraphQLNonNull
+    GraphQLNonNull,
 } from 'graphql/type';
 
-import { langs, getLangs } from 'src/lib/api/lang';
+import { langs } from 'src/lib/api/lang';
 
 import {
 	getWorld,
@@ -26,7 +25,7 @@ export const World = new GraphQLObjectType({
         id: { type: GraphQLString },
 		population: { type: GraphQLString },
 		slugs: { type: new GraphQLList(GraphQLString) },
-    })
+    }),
 });
 
 export const WorldLang = new GraphQLObjectType({
@@ -34,14 +33,14 @@ export const WorldLang = new GraphQLObjectType({
     fields: () => ({
         name: { type: GraphQLString },
         slug: { type: GraphQLString },
-    })
+    }),
 });
 
 
 export const WorldQuery = {
     type: World,
     args: {
-        id: { type: new GraphQLNonNull(GraphQLID), }
+        id: { type: new GraphQLNonNull(GraphQLID) },
     },
     resolve: (parent, { id }) => getWorld(id),
 };
@@ -49,7 +48,7 @@ export const WorldQuery = {
 export const WorldsQuery = {
     type: new GraphQLList(World),
     args: {
-        ids: { type: new GraphQLList(GraphQLID), }
+        ids: { type: new GraphQLList(GraphQLID) },
     },
     resolve: (parent, { ids=["all"] }) => {
 		return getWorlds(ids);

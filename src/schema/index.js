@@ -5,8 +5,8 @@ import {
 
 import _ from 'lodash';
 
-import { World, queries as worldQueries } from 'src/schema/world';
-import { Lang, queries as langQueries } from 'src/schema/lang';
+import { queries as worldQueries } from 'src/schema/world';
+import { queries as langQueries } from 'src/schema/lang';
 
 
 
@@ -16,7 +16,7 @@ const RootType = new GraphQLObjectType({
 		// Objective.queries,
 		worldQueries,
 		langQueries,
-	)
+	),
 });
 
 export default new GraphQLSchema({ query: RootType });

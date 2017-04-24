@@ -1,10 +1,9 @@
 
-import path from 'path';
-
 import Promise from 'bluebird';
 import _ from 'lodash';
 
 
+import { slugify } from 'src/lib/util';
 import { fetch } from 'src/lib/api';
 import { langs } from 'src/lib/api/lang';
 
@@ -12,20 +11,45 @@ import { langs } from 'src/lib/api/lang';
 let cache = {};
 
 const ENDPOINT_WORLDS = `/v2/worlds`;
+const UPDATE_MIN = 1000 * 60 * 60;
+const UPDATE_MAX = UPDATE_MIN * 4;
 
-function slugify(str) {
-	return _.words(_.deburr(str).toLowerCase()).join('-');
-}
-
+const UPDATE_MIN_COLD = 1000 * 8;
+const UPDATE_MAX_COLD = UPDATE_MIN_COLD * 4;
 
 
 export function init() {
+	return updateCache();
+}
+
+function updateCache() {
+	return buildCache()
+		.finally(() => {
+			setTimeout(updateCache, getUpdateTimeout());
+		});
+}
+
+function getUpdateTimeout() {
+	let updateTimeout = _.random(UPDATE_MIN, UPDATE_MAX);
+
+	if (_.isEmpty(cache)) {
+		console.log('COLD CACHE');
+		updateTimeout = _.random(UPDATE_MIN_COLD, UPDATE_MAX_COLD);
+	}
+
+	console.log('world', 'updateTimeout', updateTimeout);
+
+	return updateTimeout;
+}
+
+function buildCache() {
+	console.log('buildCache');
 	return fetchWorlds().then(ids => {
 		const idList = ids.toString();
 
 		const promisedLangs = _.reduce(langs, (acc, lang) => {
 			return _.merge(acc, {
-				[lang.slug]: fetchWorlds({ ids: idList, lang: lang.slug }).then(result => _.keyBy(result, 'id'))
+				[lang.slug]: fetchWorlds({ ids: idList, lang: lang.slug }).then(result => _.keyBy(result, 'id')),
 			});
 		}, {});
 
@@ -55,13 +79,12 @@ export function init() {
 			return _.sortBy(cache, 'id');
 		});
 	});
-
-};
+}
 
 
 export function fetchWorlds(query) {
 	// console.log('fetchWorlds', query);
-    return fetch(ENDPOINT_WORLDS, query);
+    return fetch(ENDPOINT_WORLDS, query, { ttl: 1000 * 60 * 60 * 4 });
 }
 
 export function getWorld(id) {

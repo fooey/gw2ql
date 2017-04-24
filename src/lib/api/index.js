@@ -8,11 +8,10 @@ import storage from 'node-persist';
 export const CACHE_LONG = 1000 * 60 * 60;
 export const CACHE_SHORT = 1000 * 5;
 
-import langs from 'src/lib/api/lang';
 
-
-export { getObjectives } from './objective';
-export { fetchWorlds, getWorld, getWorlds } from './world';
+export { getLang, getLangs } from './lang';
+export { getObjective, getObjectives } from './objective';
+export { getWorld, getWorlds } from './world';
 
 
 export const BASE_URL = `https://api.guildwars2.com`;
@@ -26,54 +25,54 @@ export const BASE_URL = `https://api.guildwars2.com`;
 // });
 
 const instance = Fetch.defaults({
-  cacheManager: path.join(process.cwd(), 'cache', 'fetch') // path where cache will be written (and read)
+  cacheManager: path.join(process.cwd(), 'cache', 'fetch'), // path where cache will be written (and read)
 })
 
 export function init() {
 	return storage.init({
-		dir: path.join(process.cwd(), 'cache', 'persist'),
-		// stringify: JSON.stringify,
-		// parse: JSON.parse,
-		// encoding: 'utf8',
-		// logging: false,  // can also be custom logging function
-		// continuous: true, // continously persist to disk
-		// interval: false, // milliseconds, persist to disk on an interval
-		// ttl: false, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
-		ttl: 1000 * 60 * 60 * 1, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
-		// expiredInterval: 2 * 60 * 1000, // [NEW] every 2 minutes the process will clean-up the expired cache
-	    // in some cases, you (or some other service) might add non-valid storage files to your
-	    // storage dir, i.e. Google Drive, make this true if you'd like to ignore these files and not throw an error
-	    // forgiveParseErrors: false // [NEW]
+        dir: path.join(process.cwd(), 'cache', 'persist'),
+        // stringify: JSON.stringify,
+        // parse: JSON.parse,
+        // encoding: 'utf8',
+        // logging: false,  // can also be custom logging function
+        // continuous: true, // continously persist to disk
+        // interval: false, // milliseconds, persist to disk on an interval
+        // ttl: false, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
+        ttl: 1000 * 60 * 60 * 1, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
+        expiredInterval: 1000 * 60 * 2, // [NEW] every 2 minutes the process will clean-up the expired cache
+        // in some cases, you (or some other service) might add non-valid storage files to your
+        // storage dir, i.e. Google Drive, make this true if you'd like to ignore these files and not throw an error
+        // forgiveParseErrors: false // [NEW]
 	});
 }
 
 
-export function fetch(relativeURL, params = {}) {
+export function fetch(relativeURL, params = {}, storageOptions = {}) {
 	const queryString = !_.isEmpty(params) ? '?' + qs.stringify(params) : '';
     const fetchUrl = `${BASE_URL}${relativeURL}${queryString}`;
 
 	const retryOptions = {
 		retry: {
 			retries: 10,
-			randomize: true
-		}
+			randomize: true,
+		},
 	};
 
 	console.log('fetchUrl', fetchUrl, params);
 
 	return storage.getItem(fetchUrl).then(result => {
 		if (result) {
-			console.log('cache hit', fetchUrl);
+			// console.log('cache hit', fetchUrl);
 			return result;
 		} else {
-			console.log('cache miss', fetchUrl);
-		    return instance(fetchUrl, retryOptions)
+			// console.log('cache miss', fetchUrl);
+            return instance(fetchUrl, retryOptions)
 				.then(res => {
-					console.log(res.url);
+					console.log('fetched', res.url);
 
 					return res.json();
 				}).then(result => {
-					return storage.setItem(fetchUrl, result).then(() => result);
+					return storage.setItem(fetchUrl, result, storageOptions).then(() => result);
 				});
 		}
 	});

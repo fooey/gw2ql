@@ -5,7 +5,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import Promise from 'bluebird';
-import _ from 'lodash';
 
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { printSchema } from 'graphql/utilities/schemaPrinter';
@@ -27,7 +26,7 @@ console.info(Date.now(), 'SERVER', 'Initializing data...');
 Promise.all([
 	initApi(),
 	initWorlds(),
-	// initObjectives(),
+	initObjectives(),
 ])
 .then(() => console.info(Date.now(), 'SERVER', 'Data initialized, starting...'))
 .then(() => {
@@ -44,8 +43,8 @@ Promise.all([
 	app.use('/world', (req, res) => getWorlds().then(result => res.json(result)));
 
 
-	// app.use('/objective/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
-	// app.use('/objective', (req, res) => getObjectives().then(result => res.json(result)));
+	app.use('/objective/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
+	app.use('/objective', (req, res) => getObjectives().then(result => res.json(result)));
 
 })
 .then(() =>

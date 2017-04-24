@@ -19,7 +19,7 @@ function slugify(str) {
 
 export function init() {
 	return buildCache();
-};
+}
 
 function buildCache() {
 	return fetchObjectives().then(ids => {
@@ -27,7 +27,7 @@ function buildCache() {
 
 		const promisedLangs = _.reduce(langs, (acc, lang, langSlug) => {
 			return Object.assign(acc, {
-				[langSlug]: fetchObjectives({ ids: idList, lang: langSlug }).then(result => _.keyBy(result,  'id'))
+				[langSlug]: fetchObjectives({ ids: idList, lang: langSlug }).then(result => _.keyBy(result,  'id')),
 			});
 		}, {});
 
@@ -37,14 +37,14 @@ function buildCache() {
 			ids.forEach(id => {
 				const objectiveBase = {
 					id,
-			        sector_id: _.get(objectives, ['en', id, 'sector_id']),
-			        type: _.get(objectives, ['en', id, 'type']),
-			        map_type: _.get(objectives, ['en', id, 'map_type']),
-			        map_id: _.get(objectives, ['en', id, 'map_id']),
-			        coord: _.get(objectives, ['en', id, 'coord']),
-			        label_coord: _.get(objectives, ['en', id, 'label_coord']),
-			        marker: _.get(objectives, ['en', id, 'marker']),
-			        chat_link: _.get(objectives, ['en', id, 'chat_link']),
+					sector_id: _.get(objectives, ['en', id, 'sector_id']),
+					type: _.get(objectives, ['en', id, 'type']),
+					map_type: _.get(objectives, ['en', id, 'map_type']),
+					map_id: _.get(objectives, ['en', id, 'map_id']),
+					coord: _.get(objectives, ['en', id, 'coord']),
+					label_coord: _.get(objectives, ['en', id, 'label_coord']),
+					marker: _.get(objectives, ['en', id, 'marker']),
+					chat_link: _.get(objectives, ['en', id, 'chat_link']),
 				};
 
 				const objective = _.reduce(langs, (acc, lang, langSlug) => {

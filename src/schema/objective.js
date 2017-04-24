@@ -8,7 +8,7 @@ import {
     GraphQLFloat,
     GraphQLList,
     GraphQLID,
-    GraphQLNonNull
+    GraphQLNonNull,
 } from 'graphql/type';
 
 import langs from 'src/lib/api/lang';
@@ -33,7 +33,7 @@ export const ObjectiveType = new GraphQLObjectType({
         label_coord: { type: new GraphQLList(GraphQLFloat) },
         marker: { type: GraphQLString },
         chat_link: { type: GraphQLString },
-    })
+    }),
 });
 
 export const ObjectiveLangType = new GraphQLObjectType({
@@ -41,13 +41,13 @@ export const ObjectiveLangType = new GraphQLObjectType({
     fields: () => ({
         name: { type: GraphQLString },
         slug: { type: GraphQLString },
-    })
+    }),
 });
 
 export const ObjectiveQuery = {
     type: ObjectiveType,
     args: {
-        id: { type: new GraphQLNonNull(GraphQLID), }
+        id: { type: new GraphQLNonNull(GraphQLID) },
     },
     resolve: (parent, { id }) => getObjectives(id),
 };
@@ -55,7 +55,7 @@ export const ObjectiveQuery = {
 export const ObjectivesQuery = {
     type: new GraphQLList(ObjectiveType),
     args: {
-        ids: { type: new GraphQLList(GraphQLID), }
+        ids: { type: new GraphQLList(GraphQLID) },
     },
     resolve: (parent, { ids=["all"] }) => getObjectives(ids),
 };
@@ -67,5 +67,5 @@ export const queries = {
 
 export default {
 	ObjectiveType,
-	queries
+	queries,
 };
