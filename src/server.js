@@ -45,7 +45,6 @@ Promise.all([
 
 	app.use('/objective/:id', (req, res) => getObjective(req.params.id).then(result => res.json(result)));
 	app.use('/objective', (req, res) => getObjectives().then(result => res.json(result)));
-
 })
 .then(() =>
 	app.listen(PORT, () => console.info(Date.now(), 'SERVER', `Now browse to localhost:${PORT}/graphiql`))

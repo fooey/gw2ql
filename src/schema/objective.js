@@ -14,15 +14,16 @@ import {
 import langs from 'src/lib/api/lang';
 
 import {
+	getObjective,
 	getObjectives,
 } from 'src/lib/api';
 
 
 
-export const ObjectiveType = new GraphQLObjectType({
-    name: 'ObjectiveType',
+export const Objective = new GraphQLObjectType({
+    name: 'Objective',
     fields: () => _.reduce(langs, (acc, lang, langSlug) => {
-		return _.set(acc, langSlug, { type: ObjectiveLangType });
+		return _.set(acc, langSlug, { type: ObjectiveLang });
 	}, {
         id: { type: GraphQLString },
         sector_id: { type: GraphQLInt },
@@ -36,8 +37,8 @@ export const ObjectiveType = new GraphQLObjectType({
     }),
 });
 
-export const ObjectiveLangType = new GraphQLObjectType({
-    name: 'ObjectiveLangType',
+export const ObjectiveLang = new GraphQLObjectType({
+    name: 'ObjectiveLang',
     fields: () => ({
         name: { type: GraphQLString },
         slug: { type: GraphQLString },
@@ -45,15 +46,15 @@ export const ObjectiveLangType = new GraphQLObjectType({
 });
 
 export const ObjectiveQuery = {
-    type: ObjectiveType,
+    type: Objective,
     args: {
         id: { type: new GraphQLNonNull(GraphQLID) },
     },
-    resolve: (parent, { id }) => getObjectives(id),
+    resolve: (parent, { id }) => getObjective(id),
 };
 
 export const ObjectivesQuery = {
-    type: new GraphQLList(ObjectiveType),
+    type: new GraphQLList(Objective),
     args: {
         ids: { type: new GraphQLList(GraphQLID) },
     },
@@ -63,9 +64,4 @@ export const ObjectivesQuery = {
 export const queries = {
 	objective: ObjectiveQuery,
 	objectives: ObjectivesQuery,
-};
-
-export default {
-	ObjectiveType,
-	queries,
 };
