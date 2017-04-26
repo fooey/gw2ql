@@ -22,7 +22,7 @@ export const World = new GraphQLObjectType({
     fields: () => _.reduce(langs, (acc, lang) => {
 		return _.set(acc, lang.slug, { type: WorldLang });
 	}, {
-        id: { type: GraphQLString },
+        id: { type: GraphQLID },
 		population: { type: GraphQLString },
 		slugs: { type: new GraphQLList(GraphQLString) },
     }),

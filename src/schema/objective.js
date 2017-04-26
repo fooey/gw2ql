@@ -4,7 +4,6 @@ import _ from 'lodash';
 import {
     GraphQLObjectType,
     GraphQLString,
-    GraphQLInt,
     GraphQLFloat,
     GraphQLList,
     GraphQLID,
@@ -25,11 +24,11 @@ export const Objective = new GraphQLObjectType({
     fields: () => _.reduce(langs, (acc, lang, langSlug) => {
 		return _.set(acc, langSlug, { type: ObjectiveLang });
 	}, {
-        id: { type: GraphQLString },
-        sector_id: { type: GraphQLInt },
+        id: { type: GraphQLID },
+        sector_id: { type: GraphQLID },
         type: { type: GraphQLString },
         map_type: { type: GraphQLString },
-        map_id: { type: GraphQLInt },
+        map_id: { type: GraphQLID },
         coord: { type: new GraphQLList(GraphQLFloat) },
         label_coord: { type: new GraphQLList(GraphQLFloat) },
         marker: { type: GraphQLString },
