@@ -16,17 +16,29 @@ import {
 
 export const Guild = new GraphQLObjectType({
     name: 'Guild',
-    fields:  {
-        id: { type: GraphQLString },
-        level: { type: GraphQLInt },
-		motd: { type: GraphQLString },
-		influence: { type: GraphQLInt },
-		aetherium: { type: GraphQLString },
-		favor: { type: GraphQLInt },
+    fields: () => ({
+        id: { type: GraphQLID },
 		name: { type: GraphQLString },
 		tag: { type: GraphQLString },
-		emblem: { type: GraphQLString },
-    },
+		emblem: { type: GuildEmblem },
+    }),
+});
+
+export const GuildEmblem = new GraphQLObjectType({
+    name: 'GuildEmblem',
+    fields: () => ({
+        background: { type: GuildEmblemLayer },
+        foreground: { type: GuildEmblemLayer },
+		flags: { type: new GraphQLList(GraphQLString) },
+    }),
+});
+
+export const GuildEmblemLayer = new GraphQLObjectType({
+    name: 'GuildEmblemLayer',
+    fields: () => ({
+        id: { type: GraphQLID },
+		colors: { type: new GraphQLList(GraphQLID) },
+    }),
 });
 
 export const GuildQuery = {
