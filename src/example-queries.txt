@@ -1,0 +1,61 @@
+
+###
+# bits of everything
+###
+
+{
+  guild(id: "116E0C0E-0035-44A9-BB22-4AE3E23127E5") {
+    ...guildProps
+  }
+
+  guilds(ids: ["2c8fd015-ca6f-4dfd-9bac-3873a9ec9df6", "116E0C0E-0035-44A9-BB22-4AE3E23127E5", "6417168a-fc5b-e411-8290-ac162dae0bed"]) {
+    ...guildProps
+  }
+
+  world(id: "1001") {
+    ...worldProps
+  }
+  worlds(ids: ["1001", "1002"]) {
+    ...worldProps
+  }
+  objective(id: "1099-99") {
+    ...objectiveProps
+  }
+  objectives(ids: ["1099-99", "1102-99"]) {
+    ...objectiveProps
+  }
+}
+
+fragment guildProps on Guild {
+  id
+  name
+  emblem {
+    foreground { id colors }
+    background { id colors }
+    flags
+  }
+}
+
+fragment worldProps on World {
+  id
+  population
+  slugs
+  en { name slug }
+  es { name slug }
+  de { name slug }
+  fr { name slug }
+  zh { name slug }
+}
+
+fragment objectiveProps on Objective {
+  id
+  type
+  map_type
+  map_id
+  marker
+  en { name slug }
+  es { name slug }
+  de { name slug }
+  fr { name slug }
+  zh { name slug }
+}
