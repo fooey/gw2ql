@@ -6,6 +6,7 @@ import {
 import _ from 'lodash';
 
 import { queries as langQueries } from 'src/schema/lang';
+import { queries as guildQueries } from 'src/schema/guild';
 import { queries as objectiveQueries } from 'src/schema/objective';
 import { queries as worldQueries } from 'src/schema/world';
 
@@ -15,6 +16,7 @@ const RootType = new GraphQLObjectType({
 	name: 'RootType',
 	fields: _.merge(
 		langQueries,
+		guildQueries,
 		objectiveQueries,
 		worldQueries,
 	),

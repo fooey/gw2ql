@@ -10,6 +10,7 @@ export const CACHE_SHORT = 1000 * 5;
 
 
 export { getLang, getLangs } from './lang';
+export { getGuild, getGuilds } from './guild';
 export { getObjective, getObjectives } from './objective';
 export { getWorld, getWorlds } from './world';
 
@@ -31,18 +32,8 @@ const instance = Fetch.defaults({
 export function init() {
 	return storage.init({
         dir: path.join(process.cwd(), 'cache', 'persist'),
-        // stringify: JSON.stringify,
-        // parse: JSON.parse,
-        // encoding: 'utf8',
-        // logging: false,  // can also be custom logging function
-        // continuous: true, // continously persist to disk
-        // interval: false, // milliseconds, persist to disk on an interval
-        // ttl: false, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
-        ttl: 1000 * 60 * 60 * 1, // ttl* [NEW], can be true for 24h default or a number in MILLISECONDS
-        expiredInterval: 1000 * 60 * 2, // [NEW] every 2 minutes the process will clean-up the expired cache
-        // in some cases, you (or some other service) might add non-valid storage files to your
-        // storage dir, i.e. Google Drive, make this true if you'd like to ignore these files and not throw an error
-        // forgiveParseErrors: false // [NEW]
+        ttl: 1000 * 60 * 60 * 4,
+        expiredInterval: 1000 * 60 * 60 * 1,
 	});
 }
 
@@ -61,14 +52,14 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 	// console.log('fetchUrl', fetchUrl, params);
 
 	return storage.getItem(fetchUrl).then(result => {
-		if (result) {
+		if (!_.isEmpty(result)) {
 			// console.log('cache hit', fetchUrl);
 			return result;
 		} else {
 			// console.log('cache miss', fetchUrl);
             return instance(fetchUrl, retryOptions)
 				.then(res => {
-					// console.log('fetched', res.url);
+					console.log('fetched', res.url);
 
 					return res.json();
 				}).then(result => {
