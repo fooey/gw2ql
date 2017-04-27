@@ -13,6 +13,7 @@ export { getLang, getLangs } from './lang';
 export { getGuild, getGuilds } from './guild';
 export { getObjective, getObjectives } from './objective';
 export { getWorld, getWorlds } from './world';
+export { getMatch, getMatches } from './match';
 
 
 export const BASE_URL = `https://api.guildwars2.com`;
@@ -81,15 +82,15 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 	// 	});
 }
 
-
-export function fetchMatches(slug = '') {
-    return fetch(`/v2/wvw/matches${slug}`);
-}
-
-export function getMatch(id) {
-    return fetchMatches(`/${id}`);
-}
-
-export function getMatches(ids=['all']) {
-    return fetchMatches(`?ids=${ids}`);
-}
+//
+// export function fetchMatches(slug = '') {
+//     return fetch(`/v2/wvw/matches${slug}`);
+// }
+//
+// export function getMatch(id) {
+//     return fetchMatches(`/${id}`);
+// }
+//
+// export function getMatches(ids=['all']) {
+//     return fetchMatches(`?ids=${ids}`);
+// }

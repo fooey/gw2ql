@@ -4,6 +4,36 @@
 ###
 
 {
+  match(id: "1-1") {
+    id
+    start_time
+    end_time
+    scores { red green blue }
+    deaths { red blue green }
+    kills { red blue green }
+    victory_points { red blue green }
+    worlds {
+      red { ...worldProps }
+      blue { ...worldProps }
+      green { ...worldProps }
+    }
+    maps {
+      id
+      type
+      deaths { red green blue }
+      kills { red green blue }
+      objectives {
+        id type
+        owner last_flipped claimed_by
+        points_tick points_capture yaks_delivered
+        objective {
+          ...objectiveProps
+        }
+      }
+    }
+  }
+
+
   guild(id: "116E0C0E-0035-44A9-BB22-4AE3E23127E5") {
     ...guildProps
   }
