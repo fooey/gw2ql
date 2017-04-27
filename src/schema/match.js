@@ -16,8 +16,9 @@ import { Objective } from 'src/schema/objective';
 import {
 	getMatch,
 	getMatches,
-	getObjectives,
+	getObjective,
 	getWorld,
+	getWorlds,
 } from 'src/lib/api';
 
 
@@ -28,10 +29,10 @@ export const Match = new GraphQLObjectType({
 		start_time: { type: GraphQLString },
         id: { type: GraphQLID },
         end_time: { type: GraphQLString },
-        scores: { type: MatchScoresType },
-        deaths: { type: MatchScoresType },
-        kills: { type: MatchScoresType },
-        victory_points: { type: MatchScoresType },
+        scores: { type: MatchScores },
+        deaths: { type: MatchScores },
+        kills: { type: MatchScores },
+        victory_points: { type: MatchScores },
         worlds: {
             type: MatchWorlds,
             resolve: ({ worlds }) => Promise.props({
@@ -40,7 +41,16 @@ export const Match = new GraphQLObjectType({
                 blue: getWorld(worlds.blue),
             }),
         },
+        all_worlds: {
+            type: MatchAllWorlds,
+            resolve: ({ all_worlds }) => Promise.props({
+				red: getWorlds(all_worlds.red),
+				green: getWorlds(all_worlds.green),
+				blue: getWorlds(all_worlds.blue),
+			}),
+        },
         maps: { type: new GraphQLList(MatchMap) },
+        skirmishes: { type: new GraphQLList(MatchSkirmish) },
     }),
 });
 
@@ -49,8 +59,9 @@ export const MatchMap = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLString },
         type: { type: GraphQLString },
-        deaths: { type: MatchScoresType },
-        kills: { type: MatchScoresType },
+        deaths: { type: MatchScores },
+        kills: { type: MatchScores },
+        scores: { type: MatchScores },
         objectives: { type: new GraphQLList(MatchObjective) },
     }),
 });
@@ -65,8 +76,17 @@ export const MatchWorlds = new GraphQLObjectType({
 	}),
 });
 
-export const MatchScoresType = new GraphQLObjectType({
-    name: 'MatchScoresType',
+export const MatchAllWorlds = new GraphQLObjectType({
+    name: 'MatchAllWorlds',
+    fields: () => ({
+        red: { type: new GraphQLList(World) },
+        green: { type: new GraphQLList(World) },
+        blue: { type: new GraphQLList(World) },
+	}),
+});
+
+export const MatchScores = new GraphQLObjectType({
+    name: 'MatchScores',
     fields: {
         red: { type: GraphQLInt },
         green: { type: GraphQLInt },
@@ -87,9 +107,27 @@ export const MatchObjective = new GraphQLObjectType({
         yaks_delivered: { type: GraphQLInt },
         objective: {
             type: Objective,
-            resolve: ({ id }) => getObjectives(id),
+            resolve: ({ id }) => getObjective(id),
         },
     },
+});
+
+
+export const MatchSkirmish = new GraphQLObjectType({
+    name: 'MatchSkirmish',
+    fields: () => ({
+        id: { type: GraphQLString },
+        scores: { type: MatchScores },
+        map_scores: { type: new GraphQLList(MatchSkirmishMapScores) },
+    }),
+});
+
+export const MatchSkirmishMapScores = new GraphQLObjectType({
+    name: 'MatchSkirmishMapScores',
+    fields: () => ({
+        type: { type: GraphQLString },
+        scores: { type: MatchScores },
+    }),
 });
 
 
