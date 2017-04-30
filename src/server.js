@@ -3,8 +3,10 @@ import 'app-module-path/cwd';
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import morgan from 'morgan';
 
 import Promise from 'bluebird';
+import _ from 'lodash';
 
 import { graphqlExpress, graphiqlExpress } from 'graphql-server-express';
 import { printSchema } from 'graphql/utilities/schemaPrinter';
@@ -17,8 +19,17 @@ import { init as initObjectives, getObjective, getObjectives } from 'src/lib/api
 import { init as initWorlds, getWorld, getWorlds } from 'src/lib/api/world';
 import { init as initMatches, getMatch, getMatches } from 'src/lib/api/match';
 
+const ENV = _.get(process, 'env.NODE_ENV', 'development');
+global.isDev = ENV === 'development';
 
-const app = express().use('*', cors());
+
+const app = express();
+
+if (global.isDev) {
+	app.use(morgan('tiny'))
+}
+
+app.use('*', cors());
 
 
 const PORT = 4000;
