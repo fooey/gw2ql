@@ -7,7 +7,7 @@ import { fetch } from 'src/lib/api';
 
 
 const ENDPOINT_MATCHES = `/v2/wvw/matches`;
-const STORAGE_OPTIONS = { ttl: 1000 * 60 * 60 * 4 };
+const STORAGE_OPTIONS = { ttl: 1000 * 1 };
 
 const UPDATE_MIN = 1000 * 2;
 const UPDATE_MAX = UPDATE_MIN * 2;
@@ -34,10 +34,23 @@ function buildCache() {
 	// console.log('match', 'buildCache');
 
 	return fetchMatches({ids: 'all'}).then(matches => {
-		INSTANCE.cache =  _.keyBy(matches, 'id');
+		INSTANCE.cache =  _.chain(matches)
+			.map(match => buildMatch(match))
+			.keyBy('id')
+			.value();
 
 		return INSTANCE.cache;
 	});
+}
+
+function buildMatch(match) {
+	_.set(match, 'region', getRegion(match.id));
+
+	return match;
+}
+
+function getRegion(matchId) {
+	return (matchId.charAt(0) === '1') ? 'NA' : 'EU';
 }
 
 

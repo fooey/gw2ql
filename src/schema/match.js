@@ -1,5 +1,6 @@
 
 import Promise from 'bluebird';
+import _ from 'lodash';
 
 import {
     GraphQLObjectType,
@@ -51,6 +52,8 @@ export const Match = new GraphQLObjectType({
         },
         maps: { type: new GraphQLList(MatchMap) },
         skirmishes: { type: new GraphQLList(MatchSkirmish) },
+
+        region: { type: GraphQLString },
     }),
 });
 
@@ -147,8 +150,18 @@ export const MatchesQuery = {
     type: new GraphQLList(Match),
     args: {
         ids: { type: new GraphQLList(GraphQLID) },
+        region: { type: GraphQLString },
     },
-    resolve: (parent, { ids=["all"] }) => getMatches(ids),
+    resolve: (parent, { ids=["all"], region }) => {
+		return getMatches(ids).then(result => {
+
+			if (!_.isEmpty(region) && !_.isEmpty(result)) {
+				result = _.filter(result, { region });
+			}
+
+			return result;
+		});
+	},
 };
 
 export const queries = {
