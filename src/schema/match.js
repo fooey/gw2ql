@@ -37,6 +37,10 @@ export const Match = new GraphQLObjectType({
         worlds: {
             type: MatchWorlds,
             resolve: ({ worlds }) => Promise.props({
+				red_id: Promise.resolve(worlds.red),
+				green_id: Promise.resolve(worlds.green),
+				blue_id: Promise.resolve(worlds.blue),
+
                 red: getWorld(worlds.red),
                 green: getWorld(worlds.green),
                 blue: getWorld(worlds.blue),
@@ -73,6 +77,9 @@ export const MatchMap = new GraphQLObjectType({
 export const MatchWorlds = new GraphQLObjectType({
     name: 'MatchWorlds',
     fields: () => ({
+        red_id: { type: GraphQLID },
+        green_id: { type: GraphQLID },
+        blue_id: { type: GraphQLID },
         red: { type: World },
         green: { type: World },
         blue: { type: World },
