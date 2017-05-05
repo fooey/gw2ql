@@ -24,6 +24,8 @@ export const World = new GraphQLObjectType({
 	}, {
         id: { type: GraphQLID },
 		population: { type: GraphQLString },
+		region: { type: GraphQLString },
+		lang: { type: GraphQLString },
 		slugs: { type: new GraphQLList(GraphQLString) },
     }),
 });

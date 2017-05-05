@@ -65,9 +65,13 @@ function buildCache() {
 }
 
 function buildWorld(id, worlds, langs) {
+	id = id.toString();
+
 	const worldBase = {
-		id: id.toString(),
+		id,
 		population: _.get(worlds, ['en', id, 'population']),
+		region: getRegion(id),
+		lang: getLang(id),
 		slugs: [],
 	};
 
@@ -80,6 +84,24 @@ function buildWorld(id, worlds, langs) {
 		return _.set(acc, lang.slug, { name, slug });
 
 	}, worldBase);
+}
+
+function getRegion(worldId) {
+	switch (worldId[0]) {
+		case '1': return 'na';
+		case '2': return 'eu';
+		default: return 'err';
+	}
+}
+
+function getLang(worldId) {
+	switch (worldId[1]) {
+		case '0': return 'en';
+		case '1': return 'fr';
+		case '2': return 'de';
+		case '3': return 'es';
+		default: return 'err';
+	}
 }
 
 
