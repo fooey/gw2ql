@@ -1,6 +1,7 @@
 
 import {
     GraphQLObjectType,
+    GraphQLID,
     GraphQLString,
     GraphQLList,
     GraphQLNonNull,
@@ -17,7 +18,7 @@ import {
 export const Lang = new GraphQLObjectType({
     name: 'Lang',
     fields: () => ({
-        slug: { type: GraphQLString },
+        slug: { type: GraphQLID },
         name: { type: GraphQLString },
         label: { type: GraphQLString },
     }),
@@ -27,7 +28,7 @@ export const Lang = new GraphQLObjectType({
 export const LangQuery = {
     type: Lang,
     args: {
-        slug: { type: new GraphQLNonNull(GraphQLString) },
+        slug: { type: new GraphQLNonNull(GraphQLID) },
     },
     resolve: (parent, { slug }) => getLang(slug),
 };
@@ -35,7 +36,7 @@ export const LangQuery = {
 export const LangsQuery = {
     type: new GraphQLList(Lang),
     args: {
-        slugs: { type: new GraphQLList(GraphQLString) },
+        slugs: { type: new GraphQLList(GraphQLID) },
     },
     resolve: (parent, { slugs = [] }) => getLangs(slugs),
 };
