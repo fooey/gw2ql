@@ -49,6 +49,10 @@ export const Match = new GraphQLObjectType({
         all_worlds: {
             type: MatchAllWorlds,
             resolve: ({ all_worlds }) => Promise.props({
+				red_ids: Promise.resolve(all_worlds.red),
+				green_ids: Promise.resolve(all_worlds.green),
+				blue_ids: Promise.resolve(all_worlds.blue),
+
 				red: getWorlds(all_worlds.red),
 				green: getWorlds(all_worlds.green),
 				blue: getWorlds(all_worlds.blue),
@@ -56,8 +60,11 @@ export const Match = new GraphQLObjectType({
         },
         maps: { type: new GraphQLList(MatchMap) },
         skirmishes: { type: new GraphQLList(MatchSkirmish) },
-
         region: { type: GraphQLString },
+		world_ids: {
+			type: new GraphQLList(GraphQLID),
+			resolve: ({ all_worlds}) => Promise.resolve(_.flatten(_.values(all_worlds))),
+		},
     }),
 });
 
@@ -80,6 +87,7 @@ export const MatchWorlds = new GraphQLObjectType({
         red_id: { type: GraphQLID },
         green_id: { type: GraphQLID },
         blue_id: { type: GraphQLID },
+
         red: { type: World },
         green: { type: World },
         blue: { type: World },
@@ -89,6 +97,10 @@ export const MatchWorlds = new GraphQLObjectType({
 export const MatchAllWorlds = new GraphQLObjectType({
     name: 'MatchAllWorlds',
     fields: () => ({
+        red_ids: { type: new GraphQLList(GraphQLID) },
+        green_ids: { type: new GraphQLList(GraphQLID) },
+        blue_ids: { type: new GraphQLList(GraphQLID) },
+
         red: { type: new GraphQLList(World) },
         green: { type: new GraphQLList(World) },
         blue: { type: new GraphQLList(World) },
