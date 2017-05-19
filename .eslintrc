@@ -17,6 +17,8 @@
   "rules": {
     "no-console": "off",
     "strict": ["error", "global"],
-	"comma-dangle": ["error", "always-multiline"]
+	"comma-dangle": ["error", "always-multiline"],
+	"semi": ["error", "always"],
+    "indent": ["error", "tab"]
   }
 }
