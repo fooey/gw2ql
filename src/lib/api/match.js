@@ -45,12 +45,21 @@ function buildCache() {
 
 function buildMatch(match) {
 	_.set(match, 'region', getRegion(match.id));
+	_.set(match, 'world_ids', getWorldIds(match.all_worlds));
 
 	return match;
 }
 
 function getRegion(matchId) {
 	return (matchId.charAt(0) === '1') ? 'NA' : 'EU';
+}
+
+function getWorldIds(allWorlds) {
+	return _.chain(allWorlds)
+		.values()
+		.flatten()
+		.map(id => id.toString())
+		.value();
 }
 
 

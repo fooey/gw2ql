@@ -63,7 +63,7 @@ export const Match = new GraphQLObjectType({
         region: { type: GraphQLString },
 		world_ids: {
 			type: new GraphQLList(GraphQLID),
-			resolve: ({ all_worlds}) => Promise.resolve(_.flatten(_.values(all_worlds))),
+			// resolve: ({ all_worlds}) => Promise.resolve(_.flatten(_.values(all_worlds))),
 		},
     }),
 });
