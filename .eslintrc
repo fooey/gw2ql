@@ -19,6 +19,6 @@
     "strict": ["error", "global"],
 	"comma-dangle": ["error", "always-multiline"],
 	"semi": ["error", "always"],
-    "indent": ["error", "tab"]
+    "indent": ["error", "tab", { "SwitchCase": 1 }]
   }
 }

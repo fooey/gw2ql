@@ -65,18 +65,18 @@ function getWorldIds(allWorlds) {
 
 export function fetchMatches(query) {
 	// console.log('fetchMatches', query);
-    return fetch(ENDPOINT_MATCHES, query, STORAGE_OPTIONS);
+	return fetch(ENDPOINT_MATCHES, query, STORAGE_OPTIONS);
 }
 
 export function getMatch(id) {
 	id = id.toString();
 	// console.log('getMatch', id);
-    return Promise.resolve(_.get(INSTANCE.cache, id));
+	return Promise.resolve(_.get(INSTANCE.cache, id));
 }
 
 export function getWorldMatch(worldId) {
 	worldId = worldId.toString();
-    return Promise.resolve(_.find(INSTANCE.cache, match => {
+	return Promise.resolve(_.find(INSTANCE.cache, match => {
 		return _.includes(match.world_ids, worldId);
 	}));
 }

@@ -1,10 +1,10 @@
 
 import {
-    GraphQLObjectType,
-    GraphQLID,
-    GraphQLString,
-    GraphQLList,
-    GraphQLNonNull,
+	GraphQLObjectType,
+	GraphQLID,
+	GraphQLString,
+	GraphQLList,
+	GraphQLNonNull,
 } from 'graphql/type';
 
 import {
@@ -16,29 +16,29 @@ import {
 
 
 export const Lang = new GraphQLObjectType({
-    name: 'Lang',
-    fields: () => ({
-        slug: { type: GraphQLID },
-        name: { type: GraphQLString },
-        label: { type: GraphQLString },
-    }),
+	name: 'Lang',
+	fields: () => ({
+		slug: { type: GraphQLID },
+		name: { type: GraphQLString },
+		label: { type: GraphQLString },
+	}),
 });
 
 
 export const LangQuery = {
-    type: Lang,
-    args: {
-        slug: { type: new GraphQLNonNull(GraphQLID) },
-    },
-    resolve: (parent, { slug }) => getLang(slug),
+	type: Lang,
+	args: {
+		slug: { type: new GraphQLNonNull(GraphQLID) },
+	},
+	resolve: (parent, { slug }) => getLang(slug),
 };
 
 export const LangsQuery = {
-    type: new GraphQLList(Lang),
-    args: {
-        slugs: { type: new GraphQLList(GraphQLID) },
-    },
-    resolve: (parent, { slugs = [] }) => getLangs(slugs),
+	type: new GraphQLList(Lang),
+	args: {
+		slugs: { type: new GraphQLList(GraphQLID) },
+	},
+	resolve: (parent, { slugs = [] }) => getLangs(slugs),
 };
 
 export const queries = {

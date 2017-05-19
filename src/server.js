@@ -26,7 +26,7 @@ global.isDev = ENV === 'development';
 const app = express();
 
 if (global.isDev) {
-	app.use(morgan('tiny'))
+	app.use(morgan('tiny'));
 }
 
 app.use('*', cors());

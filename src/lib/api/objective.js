@@ -89,12 +89,12 @@ function buildObjective(id, objectives, langs) {
 
 export function fetchObjectives(query) {
 	// console.log('fetchObjectives', query);
-    return fetch(ENDPOINT_OBJECTIVES, query, STORAGE_OPTIONS);
+	return fetch(ENDPOINT_OBJECTIVES, query, STORAGE_OPTIONS);
 }
 
 export function getObjective(id) {
 	// console.log('getObjective', id);
-    return Promise.resolve(_.get(INSTANCE.cache, id));
+	return Promise.resolve(_.get(INSTANCE.cache, id));
 }
 
 export function getObjectives(ids=['all']) {

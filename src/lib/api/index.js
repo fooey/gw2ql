@@ -27,21 +27,21 @@ export const BASE_URL = `https://api.guildwars2.com`;
 // });
 
 const instance = Fetch.defaults({
-  cacheManager: path.join(process.cwd(), 'cache', 'fetch'), // path where cache will be written (and read)
-})
+	cacheManager: path.join(process.cwd(), 'cache', 'fetch'), // path where cache will be written (and read)
+});
 
 export function init() {
 	return storage.init({
-        dir: path.join(process.cwd(), 'cache', 'persist'),
-        ttl: 1000 * 60 * 60 * 4,
-        expiredInterval: 1000 * 60 * 60 * 1,
+		dir: path.join(process.cwd(), 'cache', 'persist'),
+		ttl: 1000 * 60 * 60 * 4,
+		expiredInterval: 1000 * 60 * 60 * 1,
 	});
 }
 
 
 export function fetch(relativeURL, params = {}, storageOptions = {}) {
 	const queryString = !_.isEmpty(params) ? '?' + qs.stringify(params) : '';
-    const fetchUrl = `${BASE_URL}${relativeURL}${queryString}`;
+	const fetchUrl = `${BASE_URL}${relativeURL}${queryString}`;
 
 	const retryOptions = {
 		retry: {
@@ -58,7 +58,7 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 			return result;
 		} else {
 			// console.log('cache miss', fetchUrl);
-            return instance(fetchUrl, retryOptions)
+			return instance(fetchUrl, retryOptions)
 				.then(res => {
 					// console.log('fetched', res.url);
 

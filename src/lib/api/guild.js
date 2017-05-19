@@ -14,16 +14,16 @@ export function init() {
 
 export function fetchGuild(id) {
 	// console.log('fetchGuilds', query);
-    return fetch(`${ENDPOINT_GUILD}/${id}`, {}, STORAGE_OPTIONS);
+	return fetch(`${ENDPOINT_GUILD}/${id}`, {}, STORAGE_OPTIONS);
 }
 
 export function getGuild(id) {
 	// console.log('getGuild', id);
 
-    return fetchGuild(id);
+	return fetchGuild(id);
 }
 
 export function getGuilds(ids) {
 	// console.log('getGuild', id);
-    return Promise.map(ids, id => getGuild(id));
+	return Promise.map(ids, id => getGuild(id));
 }
