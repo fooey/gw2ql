@@ -114,6 +114,12 @@ export function getWorld(id) {
 	// console.log('getWorld', id);
     return Promise.resolve(_.get(INSTANCE.cache, id));
 }
+export function getWorldBySlug(slug) {
+	// console.log('getWorldBySlug', slug);
+    return Promise.resolve(_.find(INSTANCE.cache, world => {
+		return _.includes(world.slugs, slug);
+	}));
+}
 
 export function getWorlds(ids=['all']) {
 	// console.log('getWorlds', ids.toString());

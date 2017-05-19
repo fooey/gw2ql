@@ -12,8 +12,8 @@ export const CACHE_SHORT = 1000 * 5;
 export { getLang, getLangs } from './lang';
 export { getGuild, getGuilds } from './guild';
 export { getObjective, getObjectives } from './objective';
-export { getWorld, getWorlds } from './world';
-export { getMatch, getMatches } from './match';
+export { getWorld, getWorlds, getWorldBySlug } from './world';
+export { getMatch, getMatches, getWorldMatch } from './match';
 
 
 export const BASE_URL = `https://api.guildwars2.com`;
@@ -68,29 +68,4 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 				});
 		}
 	});
-
-    // return instance.get(fetchUrl, { params })
-	// 	.then(response => {
-	// 		console.log('requestURL', _.get(response, 'request._currentRequest.path', 'PATH NOT FOUND'));
-	// 		// console.log('data', response.data);
-	//
-	// 		return _.get(response, 'data');
-	// 	})
-	// 	.catch(err => {
-	// 		console.error(err);
-	// 		return [];
-	// 	});
 }
-
-//
-// export function fetchMatches(slug = '') {
-//     return fetch(`/v2/wvw/matches${slug}`);
-// }
-//
-// export function getMatch(id) {
-//     return fetchMatches(`/${id}`);
-// }
-//
-// export function getMatches(ids=['all']) {
-//     return fetchMatches(`?ids=${ids}`);
-// }

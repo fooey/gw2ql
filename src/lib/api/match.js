@@ -69,8 +69,16 @@ export function fetchMatches(query) {
 }
 
 export function getMatch(id) {
+	id = id.toString();
 	// console.log('getMatch', id);
     return Promise.resolve(_.get(INSTANCE.cache, id));
+}
+
+export function getWorldMatch(worldId) {
+	worldId = worldId.toString();
+    return Promise.resolve(_.find(INSTANCE.cache, match => {
+		return _.includes(match.world_ids, worldId);
+	}));
 }
 
 export function getMatches(ids=['all']) {

@@ -8,7 +8,7 @@ import {
     GraphQLList,
     GraphQLID,
     GraphQLInt,
-    GraphQLNonNull,
+    // GraphQLNonNull,
 
 } from 'graphql/type';
 import { World } from 'src/schema/world';
@@ -20,6 +20,8 @@ import {
 	getObjective,
 	getWorld,
 	getWorlds,
+	getWorldMatch,
+	getWorldBySlug,
 } from 'src/lib/api';
 
 
@@ -160,9 +162,19 @@ export const MatchSkirmishMapScores = new GraphQLObjectType({
 export const MatchQuery = {
     type: Match,
     args: {
-        id: { type: new GraphQLNonNull(GraphQLID) },
+        id: { type: GraphQLID },
+        world_id: { type: GraphQLID },
+        world_slug: { type: GraphQLString },
     },
-    resolve: (parent, { id }) => getMatch(id),
+    resolve: (parent, { id, world_id, world_slug }) => {
+		if (!_.isEmpty(id)) {
+			return getMatch(id);
+		} else if (!_.isEmpty(world_id)) {
+			return getWorldMatch(world_id);
+		} else if (!_.isEmpty(world_slug)) {
+			return getWorldBySlug(world_slug).then(world => getWorldMatch(world.id));
+		}
+	},
 };
 
 export const MatchesQuery = {
