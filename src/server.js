@@ -20,6 +20,7 @@ import { init as initWorlds, getWorld, getWorlds } from 'src/lib/api/world';
 import { init as initMatches, getMatch, getMatches } from 'src/lib/api/match';
 
 const ENV = _.get(process, 'env.NODE_ENV', 'development');
+const PORT = process.env.PORT ? process.env.PORT : 4000;
 global.isDev = ENV === 'development';
 
 
@@ -31,8 +32,6 @@ if (global.isDev) {
 
 app.use('*', cors());
 
-
-const PORT = 4000;
 
 console.info(Date.now(), 'SERVER', 'Initializing data...');
 Promise.all([
