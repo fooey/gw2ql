@@ -1,7 +1,7 @@
 {
-  "name": "express-graphql",
+  "name": "gw2ql",
   "version": "1.0.0",
-  "main": "./src/server.js",
+  "main": "./src/index.js",
   "license": "MIT",
   "dependencies": {
     "app-module-path": "^2.2.0",
