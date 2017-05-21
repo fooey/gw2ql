@@ -2,7 +2,8 @@ import path from 'path';
 import qs from 'querystring';
 
 import _ from 'lodash';
-import Fetch from 'make-fetch-happen';
+// import Fetch from 'make-fetch-happen';
+import axios from 'axios';
 import storage from 'node-persist';
 
 export const CACHE_LONG = 1000 * 60 * 60;
@@ -26,8 +27,14 @@ export const BASE_URL = `https://api.guildwars2.com`;
 //   timeout: 1000 * 10
 // });
 
-const instance = Fetch.defaults({
-	cacheManager: path.join(process.cwd(), 'cache', 'fetch'), // path where cache will be written (and read)
+// const instance = Fetch.defaults({
+// 	cacheManager: path.join(process.cwd(), 'cache', 'fetch'), // path where cache will be written (and read)
+// });
+
+const instance = axios.create({
+	baseURL: BASE_URL,
+	timeout: 3000,
+	// headers: {'X-Custom-Header': 'foobar'}
 });
 
 export function init() {
@@ -41,14 +48,14 @@ export function init() {
 
 export function fetch(relativeURL, params = {}, storageOptions = {}) {
 	const queryString = !_.isEmpty(params) ? '?' + qs.stringify(params) : '';
-	const fetchUrl = `${BASE_URL}${relativeURL}${queryString}`;
+	const fetchUrl = `${relativeURL}${queryString}`;
 
-	const retryOptions = {
-		retry: {
-			retries: 10,
-			randomize: true,
-		},
-	};
+	// const retryOptions = {
+	// 	retry: {
+	// 		retries: 10,
+	// 		randomize: true,
+	// 	},
+	// };
 
 	// console.log('fetchUrl', fetchUrl, params);
 
@@ -58,12 +65,19 @@ export function fetch(relativeURL, params = {}, storageOptions = {}) {
 			return result;
 		} else {
 			// console.log('cache miss', fetchUrl);
-			return instance(fetchUrl, retryOptions)
+			return instance(fetchUrl)
 				.then(res => {
-					// console.log('fetched', res.url);
+					const { status, statusText, data } = res;
 
-					return res.json();
-				}).then(result => {
+					if (status.toString().charAt(0) !== '2') {
+						throw(statusText);
+					} else {
+						return data;
+					}
+					// console.log('res', res);
+				})
+				.then(result => {
+					// console.log('result', result);
 					return storage.setItem(fetchUrl, result, storageOptions).then(() => result);
 				});
 		}
