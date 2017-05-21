@@ -9,7 +9,7 @@ import { fetch } from 'src/lib/api';
 const ENDPOINT_MATCHES = `/v2/wvw/matches`;
 const STORAGE_OPTIONS = { ttl: 1000 * 1 };
 
-const UPDATE_MIN = 1000 * 2;
+const UPDATE_MIN = 1000 * 8;
 const UPDATE_MAX = UPDATE_MIN * 2;
 
 
