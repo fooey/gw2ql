@@ -67,6 +67,9 @@ export const Match = new GraphQLObjectType({
 			type: new GraphQLList(GraphQLID),
 			// resolve: ({ all_worlds}) => Promise.resolve(_.flatten(_.values(all_worlds))),
 		},
+		last_flipped: { type: GraphQLInt },
+		claimed_at: { type: GraphQLInt },
+		last_modified: { type: GraphQLInt },
 	}),
 });
 
@@ -79,6 +82,9 @@ export const MatchMap = new GraphQLObjectType({
 		kills: { type: MatchScores },
 		scores: { type: MatchScores },
 		objectives: { type: new GraphQLList(MatchObjective) },
+		last_flipped: { type: GraphQLInt },
+		claimed_at: { type: GraphQLInt },
+		last_modified: { type: GraphQLInt },
 	}),
 });
 
@@ -124,8 +130,10 @@ export const MatchObjective = new GraphQLObjectType({
 		id: { type: GraphQLString },
 		type: { type: GraphQLString },
 		owner: { type: GraphQLString },
-		last_flipped: { type: GraphQLString },
+		last_flipped: { type: GraphQLInt },
 		claimed_by: { type: GraphQLString },
+		claimed_at: { type: GraphQLInt },
+		last_modified: { type: GraphQLInt },
 		points_tick: { type: GraphQLInt },
 		points_capture: { type: GraphQLInt },
 		yaks_delivered: { type: GraphQLInt },

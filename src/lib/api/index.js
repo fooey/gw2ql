@@ -33,7 +33,7 @@ export const BASE_URL = `https://api.guildwars2.com`;
 
 const instance = axios.create({
 	baseURL: BASE_URL,
-	timeout: 3000,
+	timeout: 5000,
 	// headers: {'X-Custom-Header': 'foobar'}
 });
 
