@@ -13,6 +13,7 @@ import {
 } from 'graphql/type';
 import { World } from 'src/schema/world';
 import { Objective } from 'src/schema/objective';
+import { Stat } from 'src/schema/teamStat';
 
 import {
 	getMatch,
@@ -23,6 +24,8 @@ import {
 	getWorldMatch,
 	getWorldBySlug,
 } from 'src/lib/api';
+
+import { getTeamStats } from 'src/lib/api/teamStat';
 
 
 
@@ -70,6 +73,10 @@ export const Match = new GraphQLObjectType({
 		last_flipped: { type: GraphQLInt },
 		claimed_at: { type: GraphQLInt },
 		last_modified: { type: GraphQLInt },
+		team_stats: {
+			type: new GraphQLList(Stat),
+			resolve: ({ id }) => getTeamStats(id),
+		},
 	}),
 });
 

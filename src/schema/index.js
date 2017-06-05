@@ -10,6 +10,7 @@ import { queries as guildQueries } from 'src/schema/guild';
 import { queries as objectiveQueries } from 'src/schema/objective';
 import { queries as worldQueries } from 'src/schema/world';
 import { queries as matchesQueries } from 'src/schema/match';
+import { queries as teamStatsQueries } from 'src/schema/teamStat';
 
 
 
@@ -21,6 +22,7 @@ const RootType = new GraphQLObjectType({
 		objectiveQueries,
 		worldQueries,
 		matchesQueries,
+		teamStatsQueries,
 	),
 });
 
