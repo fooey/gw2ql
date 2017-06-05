@@ -24,25 +24,47 @@ const PORT = process.env.PORT ? process.env.PORT : 4000;
 global.isDev = ENV === 'development';
 
 
-const app = express();
+(async () => {
+	try {
+		const app = express();
 
-if (global.isDev) {
-	app.use(morgan('tiny'));
+		await attachMiddleware(app);
+		await buildCache();
+		await attachRoutes(app);
+		await startServer(app);
+	}
+	catch(err) {
+		handleError(err);
+	}
+})();
+
+
+
+async function attachMiddleware(app) {
+	if (global.isDev) {
+		app.use(morgan('tiny'));
+	}
+
+	app.use('*', cors());
 }
 
-app.use('*', cors());
+async function buildCache() {
+	console.info(Date.now(), 'SERVER', 'Initializing data...');
 
+	await Promise.all([
+		initApi(),
+		initWorlds(),
+		initObjectives(),
+		initMatches(),
+	]);
 
-console.info(Date.now(), 'SERVER', 'Initializing data...');
-Promise.all([
-	initApi(),
-	initWorlds(),
-	initObjectives(),
-	initMatches(),
-])
-.then(() => console.info(Date.now(), 'SERVER', 'Data initialized, starting...'))
-.then(() => {
-	console.info(Date.now(), 'SERVER', 'Creating routes...');
+	console.info(Date.now(), 'SERVER', 'Data initialized, starting...');
+
+	return;
+}
+
+async function attachRoutes(app) {
+	console.info(Date.now(), 'SERVER', 'Attaching routes...');
 
 	app.use('/graphql', bodyParser.json(), graphqlExpress({ schema, context: {} }));
 	app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
@@ -59,8 +81,14 @@ Promise.all([
 
 	app.use('/match/:id', (req, res) => getMatch(req.params.id).then(result => res.json(result)));
 	app.use(['/match', '/matches'], (req, res) => getMatches().then(result => res.json(result)));
-})
-.then(() =>
-	app.listen(PORT, () => console.info(Date.now(), 'SERVER', `Now browse to localhost:${PORT}/graphiql`))
-)
-.catch((err) => console.error(Date.now(), 'SERVER', 'error', err));
+
+	return app;
+}
+
+async function startServer(app) {
+	return app.listen(PORT, () => console.info(Date.now(), 'SERVER', `Now browse to localhost:${PORT}/graphiql`));
+}
+
+async function handleError(err) {
+	return console.error(Date.now(), 'SERVER', 'error', err);
+}

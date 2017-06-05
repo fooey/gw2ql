@@ -5,6 +5,7 @@ import _ from 'lodash';
 // import Fetch from 'make-fetch-happen';
 import axios from 'axios';
 import storage from 'node-persist';
+import promiseRetry from 'promise-retry';
 
 export const CACHE_LONG = 1000 * 60 * 60;
 export const CACHE_SHORT = 1000 * 5;
@@ -15,71 +16,85 @@ export { getGuild, getGuilds } from './guild';
 export { getObjective, getObjectives } from './objective';
 export { getWorld, getWorlds, getWorldBySlug } from './world';
 export { getMatch, getMatches, getWorldMatch } from './match';
+export { getTeamStats, getMatchStatsByType, getTeamStatsByColor, getTeamStat } from './teamStat';
 
 
 export const BASE_URL = `https://api.guildwars2.com`;
+export const COLORS = ['red', 'blue', 'green'];
+export const CACHE_PATH = path.join(process.cwd(), 'cache', 'persist');
 
-// export { getMember } from './member';
-
-
-// const instance = axios.create({
-//   baseURL: BASE_URL,
-//   timeout: 1000 * 10
-// });
-
-// const instance = Fetch.defaults({
-// 	cacheManager: path.join(process.cwd(), 'cache', 'fetch'), // path where cache will be written (and read)
-// });
-
-const instance = axios.create({
+const fetchInstance = axios.create({
 	baseURL: BASE_URL,
-	timeout: 5000,
+	timeout: 5 * 1000,
 	// headers: {'X-Custom-Header': 'foobar'}
 });
 
+const RETRY_OPTIONS = {
+	// retries: 10,
+	retries: 3,
+	// factor: 2,
+	// minTimeout: 1 * 1000,
+	// maxTimeout: Infinity,
+	randomize: true,
+};
+
+async function fetchRetry(fetchUrl) {
+	return promiseRetry(async (retry, number) => {
+		if (number !== 1) {
+			console.log('attempt number', number, fetchUrl);
+		}
+
+		try {
+			const res = await fetchInstance(fetchUrl);
+			const { status, statusText, data } = res;
+
+			if (status.toString().charAt(0) !== '2') {
+				throw(statusText);
+			}
+
+			return data;
+		}
+		catch(err) {
+			console.error(Date.now(), 'fetch', 'error', err);
+			retry();
+		}
+	}, RETRY_OPTIONS);
+}
+
+
 export function init() {
 	return storage.init({
-		dir: path.join(process.cwd(), 'cache', 'persist'),
+		dir: CACHE_PATH,
 		ttl: 1000 * 60 * 60 * 4,
 		expiredInterval: 1000 * 60 * 60 * 1,
 	});
 }
 
 
-export function fetch(relativeURL, params = {}, storageOptions = {}) {
-	const queryString = !_.isEmpty(params) ? '?' + qs.stringify(params) : '';
-	const fetchUrl = `${relativeURL}${queryString}`;
+export async function fetch(relativeURL, params = {}, storageOptions = {}) {
+	try {
+		const queryString = !_.isEmpty(params) ? '?' + qs.stringify(params) : '';
+		const fetchUrl = `${relativeURL}${queryString}`;
 
-	// const retryOptions = {
-	// 	retry: {
-	// 		retries: 10,
-	// 		randomize: true,
-	// 	},
-	// };
+		// console.log('fetchUrl', fetchUrl, params);
 
-	// console.log('fetchUrl', fetchUrl, params);
+		const cachedResult = await storage.getItem(fetchUrl);
 
-	return storage.getItem(fetchUrl).then(result => {
-		if (!_.isEmpty(result)) {
+		if (!_.isEmpty(cachedResult)) {
 			// console.log('cache hit', fetchUrl);
-			return result;
+			return cachedResult;
 		} else {
 			// console.log('cache miss', fetchUrl);
-			return instance(fetchUrl)
-				.then(res => {
-					const { status, statusText, data } = res;
+			const data = await fetchRetry(fetchUrl);
 
-					if (status.toString().charAt(0) !== '2') {
-						throw(statusText);
-					} else {
-						return data;
-					}
-					// console.log('res', res);
-				})
-				.then(result => {
-					// console.log('result', result);
-					return storage.setItem(fetchUrl, result, storageOptions).then(() => result);
-				});
+			await storage.setItem(fetchUrl, data, storageOptions);
+
+			// console.log('data', data);
+
+			return data;
 		}
-	});
+	}
+	catch(e) {
+		throw e;
+	}
 }

@@ -22,9 +22,13 @@ export function init() {
 	return updateCache();
 }
 
-function updateCache() {
-	return buildCache()
-		.finally(() => setTimeout(updateCache, getUpdateTimeout()));
+async function updateCache() {
+	try {
+		await buildCache();
+	}
+	catch(e){ console.log(e); }
+
+	setTimeout(updateCache, getUpdateTimeout());
 }
 
 function getUpdateTimeout() {
